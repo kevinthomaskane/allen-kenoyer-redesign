@@ -1,0 +1,56 @@
+# Architecture Decision Log
+
+This directory contains Architecture Decision Records (ADRs) for the Allen Kenoyer Glass website rebuild. Each ADR captures a single significant decision: what we chose, why, what we rejected, and what tradeoffs we accepted.
+
+## How this log works
+
+- One decision per file. Numbered sequentially in the order they are **decided** (not the order they are proposed).
+- Decisions are immutable once accepted. If we change our mind, write a new ADR that supersedes the old one, and update the old one's status.
+- Use [`TEMPLATE.md`](./TEMPLATE.md) as the starting point for any new ADR.
+
+## Status legend
+
+- **Pending** — On the roadmap, not yet discussed
+- **In Discussion** — Actively being decided
+- **Accepted** — Decision locked in
+- **Superseded by ADR-####** — Replaced by a later decision
+- **Deprecated** — No longer relevant
+
+## Decision index
+
+| # | Title | Status |
+|---|---|---|
+| [0001](./0001-frontend-framework.md) | Frontend framework (Next.js + App Router + TypeScript) | Accepted |
+| [0002](./0002-hosting-platform.md) | Hosting platform (Vercel Pro, sfo1, public previews) | Accepted |
+| [0003](./0003-package-manager-and-node-version.md) | Package manager & Node version (pnpm + Node 24 LTS) | Accepted |
+| — | Admin dashboard / CMS architecture | Pending |
+| — | Database | Pending |
+| — | Authentication (admin) | Pending |
+| — | Image pipeline & storage | Pending |
+| — | Styling & UI layer (CSS framework + component library) | Pending |
+| — | Forms & validation | Pending |
+| — | Form submission & transactional email | Pending |
+| — | Newsletter ESP integration | Pending |
+| — | Analytics & monitoring | Pending |
+| — | Testing strategy | Pending |
+| — | Linting & formatting | Pending |
+| — | Content modeling — classes | Pending |
+| — | Content modeling — bulletin board | Pending |
+| — | Content modeling — patterns catalog | Pending |
+| — | URL redirect & WordPress migration strategy | Pending |
+| — | SEO & schema markup approach | Pending |
+
+ADR numbers (`0001`, `0002`, …) are assigned as each decision is accepted, in chronological order. The Pending list above will shrink as decisions move into their own files; new decisions can be added to it at any time.
+
+### What is NOT an ADR
+
+Small choices that are easy to swap and don't reshape the codebase live in the **development guide** (to be written in Phase 2 of the project roadmap), not here. Examples: icon library, font choices, date utility, ID generation, animation library, individual schema-markup implementations, build-time scripts. If you're not sure whether something deserves an ADR, ask: *"would reversing this require touching many files and rewriting other decisions?"* If yes, it's an ADR; if no, it's a dev-guide line item.
+
+## Project scope (locked)
+
+These are foundational scope decisions established before the ADR process began. They are not ADRs themselves but they constrain every decision below:
+
+- **No e-commerce.** The site does not sell patterns, tool kits, or any product online.
+- **No online class registration.** Class signup remains in-person or by phone per studio policy.
+- **Frontend is largely static.** Pages are informational; dynamic content is limited to admin-managed classes and bulletin posts.
+- **Admin dashboard is the core feature.** The client (studio manager) must be able to manage classes and bulletin posts independently, with no developer involvement.
