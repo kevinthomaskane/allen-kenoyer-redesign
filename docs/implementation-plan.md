@@ -69,6 +69,10 @@ This document is the plan-of-record for *how* and *in what order* the build happ
 
   *Resolved (Chunk D):* Playwright browsers installed in CI only, not committed locally. Run `pnpm exec playwright install` to enable local E2E.
 
+  *Resolved (Chunk E):* Fonts loaded via `next/font/google` (Montserrat → `--font-montserrat`, Playfair Display → `--font-playfair`) on `<html>`; Tailwind tokens `--font-sans` / `--font-serif` reference them. Visually verified at `http://localhost:3000`.
+
+  *Resolved (Chunk E):* Robots → `public/robots.txt` allows all crawlers in production. Vercel auto-applies `X-Robots-Tag: noindex` on previews per [ADR-0002](./decisions/0002-hosting-platform.md), so no env-aware logic needed.
+
   *Resolved:* Legacy/demo static site → moved to `demo/` subfolder during Phase 0. Demo is the design-reference source-of-truth, not just archived code; removed once Phase 1 codifies its style patterns in the new app.
 
   *Resolved:* Directory layout → `src/` (everything under `src/app/`, `src/lib/`, `src/components/`).
@@ -142,7 +146,7 @@ Items that span phases and need a home regardless of where they land:
 
 | Phase | Status |
 |---|---|
-| 0 — Foundation | Scoped, not started |
+| 0 — Foundation | Chunks A–E complete; Chunk F (Vercel hookup) pending |
 | 1 — Public Marketing Site | Not started |
 | 2 — Admin / CMS | Not started |
 | 3 — Forms & Integrations | Not started |

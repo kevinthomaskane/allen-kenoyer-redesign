@@ -98,9 +98,12 @@
   --radius-lg: var(--radius-lg);
   --radius-xl: var(--radius-xl);
 
-  /* Fonts → font-sans / font-serif. Fonts themselves wired up in app/layout.tsx (Chunk E). */
-  --font-sans: "Montserrat", sans-serif;
-  --font-serif: "Playfair Display", serif;
+  /*
+   * Fonts → font-sans / font-serif. The CSS vars --font-montserrat and
+   * --font-playfair are set on <html> by next/font/google in app/layout.tsx.
+   */
+  --font-sans: var(--font-montserrat), sans-serif;
+  --font-serif: var(--font-playfair), serif;
 }
 
 body {
