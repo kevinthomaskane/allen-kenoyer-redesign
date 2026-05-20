@@ -56,6 +56,8 @@ This document is the plan-of-record for *how* and *in what order* the build happ
   - Opening a PR blocks merge on lint/format/test failures (gates are real, not advisory).
   - A new contributor (or future-Kevin) can clone, `pnpm install`, `pnpm dev`, and have the app running in under five minutes.
 
+- **Chunk F resolution (2026-05-20):** Vercel project `allen-kenoyer-redesign` created under 10xDev team (`prj_HaRVFReCB9eNE61ANiCVahxxxZyt`). Auto-deploys from `main`. Function region set to `sfo1` per [ADR-0002](./decisions/0002-hosting-platform.md) after initial deploy defaulted to `iad1`. Production URL: https://allen-kenoyer-redesign.vercel.app/.
+
 - **Open questions:**
   - **Font wiring** in root layout — fonts identified from demo (Montserrat for sans, Playfair Display for serif) and declared as Tailwind tokens (`--font-sans`, `--font-serif`); actual `next/font` loading happens in Chunk E.
 
@@ -150,7 +152,7 @@ Items that span phases and need a home regardless of where they land:
 
 | Phase | Status |
 |---|---|
-| 0 — Foundation | Chunks A–E complete; Chunk F (Vercel hookup) pending |
+| 0 — Foundation | **Complete** (Chunks A–F shipped 2026-05-20) |
 | 1 — Public Marketing Site | Not started |
 | 2 — Admin / CMS | Not started |
 | 3 — Forms & Integrations | Not started |
