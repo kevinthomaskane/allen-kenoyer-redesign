@@ -3,4 +3,6 @@ docs/**/*.docx
 docs/**/*.txt
 docs/website-outline.md
 node_modules/
+.playwright-mcp/
+.mcp.json
 
