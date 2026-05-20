@@ -63,6 +63,12 @@ This document is the plan-of-record for *how* and *in what order* the build happ
 
   *Resolved:* `--destructive` color → standard utility red (`#dc2626`), deliberately off-palette so destructive actions read as warnings rather than blending with brand.
 
+  *Resolved (Chunk D):* ESLint pinned to `9.39.4` (maintenance line), not 10.x. `eslint-plugin-react@7.37.5` (transitively pulled by `eslint-config-next`) hasn't migrated to ESLint 10's API. See [ADR-0014 Amendment 2026-05-20](./decisions/0014-linting-and-formatting.md#amendment-2026-05-20--eslint-9x-vs-10x).
+
+  *Resolved (Chunk D):* Markdown docs (`docs/**`) excluded from Prettier. Author writing style is preserved; Prettier formats code only.
+
+  *Resolved (Chunk D):* Playwright browsers installed in CI only, not committed locally. Run `pnpm exec playwright install` to enable local E2E.
+
   *Resolved:* Legacy/demo static site → moved to `demo/` subfolder during Phase 0. Demo is the design-reference source-of-truth, not just archived code; removed once Phase 1 codifies its style patterns in the new app.
 
   *Resolved:* Directory layout → `src/` (everything under `src/app/`, `src/lib/`, `src/components/`).

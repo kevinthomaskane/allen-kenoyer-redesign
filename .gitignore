@@ -10,6 +10,14 @@ node_modules/
 .next/
 out/
 
+# typescript incremental build cache
+tsconfig.tsbuildinfo
+
+# test artifacts
+coverage/
+playwright-report/
+test-results/
+
 # env files (keep .env.example tracked)
 .env
 .env.local

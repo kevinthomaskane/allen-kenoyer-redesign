@@ -19,9 +19,15 @@ Every TypeScript + React project benefits from a linter (catching real bugs and 
 
 Three bundled calls:
 
-1. **Linter:** ESLint (current latest: `eslint@10.4.0`).
+1. **Linter:** ESLint, pinned to the **9.x maintenance line** (current: `eslint@9.39.4`). See "Amendment 2026-05-20" below.
 2. **Formatter:** Prettier (current latest: `prettier@3.8.3`).
 3. **CI enforcement:** lint and format-check run in the GitHub Actions PR/push workflow (the same workflow as the test job from [ADR-0013](./0013-testing-strategy.md)). PRs are blocked on lint errors or formatting drift.
+
+### Amendment 2026-05-20 — ESLint 9.x vs 10.x
+
+The original decision pinned `eslint@10.4.0` ("current latest"). When Phase 0 wired up linting, ESLint 10 turned out to be incompatible with the React/Next.js ecosystem in practice: `eslint-config-next@16.2.6` (matching Next.js 16.2.6) transitively pulls `eslint-plugin-react@7.37.5`, which still calls `context.getFilename()` — removed in ESLint 10. `eslint-plugin-react` has no published fix and no public ETA.
+
+Two options were considered: stay on 10 with broken linting until upstream catches up, or downgrade to the 9.x maintenance line (`9.39.4`, fully supported, what the plugin ecosystem actually targets in 2026). We chose to downgrade. The ADR's spirit — "use the conventional Next.js pairing on a maintained line" — is satisfied better by 9.x today than by 10.x. Revisit once `eslint-plugin-react` ships ESLint 10 support.
 
 **Configuration baseline** (dev-guide level — locked here only as intent):
 - ESLint config extends Next.js's recommended rules (`eslint-config-next`) plus `typescript-eslint` rules.
