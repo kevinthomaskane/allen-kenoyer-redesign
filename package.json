@@ -1,0 +1,12 @@
+{
+  "name": "allen-kenoyer-redesign",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "extract": "node scripts/extract-content.js"
+  },
+  "dependencies": {
+    "cheerio": "^1.2.0",
+    "turndown": "^7.2.4"
+  }
+}

@@ -23,17 +23,17 @@ This directory contains Architecture Decision Records (ADRs) for the Allen Kenoy
 | [0001](./0001-frontend-framework.md) | Frontend framework (Next.js + App Router + TypeScript) | Accepted |
 | [0002](./0002-hosting-platform.md) | Hosting platform (Vercel Pro, sfo1, public previews) | Accepted |
 | [0003](./0003-package-manager-and-node-version.md) | Package manager & Node version (pnpm + Node 24 LTS) | Accepted |
-| — | Admin dashboard / CMS architecture | Pending |
-| — | Database | Pending |
-| — | Authentication (admin) | Pending |
-| — | Image pipeline & storage | Pending |
-| — | Styling & UI layer (CSS framework + component library) | Pending |
-| — | Forms & validation | Pending |
-| — | Form submission & transactional email | Pending |
-| — | Newsletter ESP integration | Pending |
-| — | Analytics & monitoring | Pending |
-| — | Testing strategy | Pending |
-| — | Linting & formatting | Pending |
+| [0004](./0004-admin-dashboard-architecture.md) | Admin dashboard / CMS architecture (custom-built in Next.js, classes + bulletins, flat permissions) | Accepted |
+| [0005](./0005-database-and-query-layer.md) | Database & query layer (Supabase Postgres + supabase-js + Supabase CLI migrations) | Accepted |
+| [0006](./0006-authentication.md) | Authentication (Supabase Auth, email+password, invite-only, custom login UI) | Accepted |
+| [0007](./0007-image-pipeline-and-storage.md) | Image pipeline & storage (Supabase Storage + next/image) | Accepted |
+| [0008](./0008-styling-and-ui-layer.md) | Styling & UI layer (Tailwind v4 + shadcn/ui, light-only) | Accepted |
+| [0009](./0009-forms-and-validation.md) | Forms & validation (Zod + React Hook Form + shadcn `<Form>`) | Accepted |
+| [0010](./0010-form-submission-and-transactional-email.md) | Form submission & transactional email (Server Actions + Resend + React Email, email-only) | Accepted |
+| [0011](./0011-newsletter-esp-integration.md) | Newsletter ESP integration (Constant Contact, link/embed, no API) | Accepted |
+| [0012](./0012-analytics-and-monitoring.md) | Analytics & monitoring (Vercel Web Analytics only, minimal stack) | Accepted |
+| [0013](./0013-testing-strategy.md) | Testing strategy (Vitest + targeted Playwright, CI-gated) | Accepted |
+| [0014](./0014-linting-and-formatting.md) | Linting & formatting (ESLint + Prettier, CI-gated) | Accepted |
 | — | Content modeling — classes | Pending |
 | — | Content modeling — bulletin board | Pending |
 | — | Content modeling — patterns catalog | Pending |
