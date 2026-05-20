@@ -34,11 +34,11 @@ This directory contains Architecture Decision Records (ADRs) for the Allen Kenoy
 | [0012](./0012-analytics-and-monitoring.md) | Analytics & monitoring (Vercel Web Analytics only, minimal stack) | Accepted |
 | [0013](./0013-testing-strategy.md) | Testing strategy (Vitest + targeted Playwright, CI-gated) | Accepted |
 | [0014](./0014-linting-and-formatting.md) | Linting & formatting (ESLint + Prettier, CI-gated) | Accepted |
-| — | Content modeling — classes | Pending |
-| — | Content modeling — bulletin board | Pending |
-| — | Content modeling — patterns catalog | Pending |
-| — | URL redirect & WordPress migration strategy | Pending |
-| — | SEO & schema markup approach | Pending |
+| [0015](./0015-content-modeling-classes.md) | Content modeling — classes (Class + Cohort + CohortSession, hidden until upcoming sessions exist) | Accepted |
+| [0016](./0016-content-modeling-bulletin-board.md) | Content modeling — bulletin board (single table, markdown message, inline-only, newest-first) | Accepted |
+| [0017](./0017-content-modeling-patterns-catalog.md) | Content modeling — patterns catalog (TS module + static /public images, grid + lightbox, no per-pattern URL) | Accepted |
+| [0018](./0018-url-redirects-and-migration.md) | URL redirect & WordPress migration strategy (next.config.ts redirects, trailingSlash: true, 301s, hard cutover) | Accepted |
+| [0019](./0019-seo-and-schema-markup.md) | SEO & schema markup approach (LocalBusiness composite + Course per class, schema-dts, app/sitemap.ts, CI validation) | Accepted |
 
 ADR numbers (`0001`, `0002`, …) are assigned as each decision is accepted, in chronological order. The Pending list above will shrink as decisions move into their own files; new decisions can be added to it at any time.
 
