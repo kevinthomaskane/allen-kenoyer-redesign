@@ -1,0 +1,13 @@
+{
+  "name": "@allen-kenoyer/migration-scripts",
+  "private": true,
+  "type": "module",
+  "description": "One-off migration scripts (content extraction from legacy WordPress site). Deleted after Phase 1/2 content migration is complete.",
+  "scripts": {
+    "extract": "node extract-content.js"
+  },
+  "dependencies": {
+    "cheerio": "^1.2.0",
+    "turndown": "^7.2.4"
+  }
+}

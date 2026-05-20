@@ -1,0 +1,119 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+/*
+ * Token system — single source of truth.
+ *
+ * Brand tokens are derived from `demo/css/styles.css` and named after the
+ * demo's variables. Semantic tokens follow shadcn's vocabulary and reference
+ * brand tokens via var() so the brand stays the single source of truth.
+ *
+ * No hex literals anywhere outside this file. Use Tailwind utilities
+ * (bg-primary, text-muted-foreground, rounded-md, font-serif, etc.) in code.
+ */
+:root {
+  /* === Brand tokens (from demo) === */
+  --primary: #6b3fa0;
+  --primary-light: #9b72c0;
+  --primary-pale: #f0e8f8;
+  --accent-rose: #d4a5b5;
+  --accent-gold: #c5975a;
+  --accent-gold-light: #eddabb;
+  --cream: #fdf7f0;
+  --cream-alt: #f7ede2;
+  --plum-dark: #2e1540;
+  --text: #3d2a4a;
+  --text-mid: #7a6070;
+  --destructive: #dc2626;
+  --white: #ffffff;
+
+  /* === Semantic tokens (shadcn vocabulary; reference brand) === */
+  --background: var(--cream);
+  --foreground: var(--text);
+  --card: var(--white);
+  --card-foreground: var(--text);
+  --popover: var(--white);
+  --popover-foreground: var(--text);
+  --primary-foreground: var(--white);
+  --secondary: var(--cream-alt);
+  --secondary-foreground: var(--text);
+  --muted: var(--primary-pale);
+  --muted-foreground: var(--text-mid);
+  --accent: var(--accent-gold);
+  --accent-foreground: var(--white);
+  --destructive-foreground: var(--white);
+  --border: color-mix(in oklab, var(--primary) 10%, transparent);
+  --input: color-mix(in oklab, var(--primary) 15%, transparent);
+  --ring: var(--primary);
+
+  /* === Radius (from demo: 12 / 20 / 32 / 48 px) === */
+  --radius-sm: 0.75rem;
+  --radius-md: 1.25rem;
+  --radius-lg: 2rem;
+  --radius-xl: 3rem;
+}
+
+/*
+ * Bridge tokens into Tailwind's utility system.
+ * `@theme inline` references the :root vars without copying values, so the
+ * brand-token source-of-truth stays in :root above.
+ */
+@theme inline {
+  /* Brand colors → Tailwind utilities (bg-primary, text-accent-gold, etc.) */
+  --color-primary: var(--primary);
+  --color-primary-light: var(--primary-light);
+  --color-primary-pale: var(--primary-pale);
+  --color-accent-rose: var(--accent-rose);
+  --color-accent-gold: var(--accent-gold);
+  --color-accent-gold-light: var(--accent-gold-light);
+  --color-cream: var(--cream);
+  --color-cream-alt: var(--cream-alt);
+  --color-plum-dark: var(--plum-dark);
+  --color-text: var(--text);
+  --color-text-mid: var(--text-mid);
+
+  /* Semantic colors → Tailwind utilities (bg-background, text-muted-foreground, etc.) */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /* Radius → rounded-sm / rounded-md / rounded-lg / rounded-xl */
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+
+  /* Fonts → font-sans / font-serif. Fonts themselves wired up in app/layout.tsx (Chunk E). */
+  --font-sans: "Montserrat", sans-serif;
+  --font-serif: "Playfair Display", serif;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  line-height: 1.7;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-serif);
+  line-height: 1.2;
+}
