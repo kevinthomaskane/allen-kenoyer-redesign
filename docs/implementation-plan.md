@@ -71,7 +71,11 @@ This document is the plan-of-record for *how* and *in what order* the build happ
 
   *Resolved (Chunk E):* Fonts loaded via `next/font/google` (Montserrat → `--font-montserrat`, Playfair Display → `--font-playfair`) on `<html>`; Tailwind tokens `--font-sans` / `--font-serif` reference them. Visually verified at `http://localhost:3000`.
 
-  *Resolved (Chunk E):* Robots → `public/robots.txt` allows all crawlers in production. Vercel auto-applies `X-Robots-Tag: noindex` on previews per [ADR-0002](./decisions/0002-hosting-platform.md), so no env-aware logic needed.
+  *Resolved (Chunk E):* Robots → initially `public/robots.txt` allowed all crawlers in production. Vercel auto-applies `X-Robots-Tag: noindex` on previews per [ADR-0002](./decisions/0002-hosting-platform.md).
+
+  *Gap-fix 2026-05-20 (post-Chunk E, ADRs 0018 + 0019 finalization):*
+  - **`trailingSlash: true`** added to `next.config.ts` per [ADR-0018](./decisions/0018-url-redirects-and-migration.md). All canonical URLs now end in `/`.
+  - **`app/robots.ts`** replaces the static `public/robots.txt` per [ADR-0019](./decisions/0019-seo-and-schema-markup.md). Adds `Disallow: /admin/` (hint only; real gate is [ADR-0006](./decisions/0006-authentication.md) auth) and references the future sitemap URL.
 
   *Resolved:* Legacy/demo static site → moved to `demo/` subfolder during Phase 0. Demo is the design-reference source-of-truth, not just archived code; removed once Phase 1 codifies its style patterns in the new app.
 
