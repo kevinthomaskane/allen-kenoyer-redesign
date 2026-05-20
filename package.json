@@ -17,7 +17,9 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "check": "pnpm lint && pnpm format:check && pnpm typecheck && pnpm test",
+    "check:e2e": "pnpm check && pnpm test:e2e"
   },
   "dependencies": {
     "class-variance-authority": "0.7.1",

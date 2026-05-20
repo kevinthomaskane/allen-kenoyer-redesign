@@ -29,18 +29,20 @@ App runs at `http://localhost:3000`.
 
 ## Scripts
 
-| Command             | What it does                                     |
-| ------------------- | ------------------------------------------------ |
-| `pnpm dev`          | Start the Next.js dev server (Turbopack).        |
-| `pnpm build`        | Production build.                                |
-| `pnpm start`        | Run the production build locally.                |
-| `pnpm lint`         | ESLint over the project.                         |
-| `pnpm format`       | Run Prettier in write mode.                      |
-| `pnpm format:check` | Run Prettier in check mode (used by CI).         |
-| `pnpm typecheck`    | `tsc --noEmit` — type-check without emitting JS. |
-| `pnpm test`         | Run Vitest unit tests once.                      |
-| `pnpm test:watch`   | Run Vitest in watch mode.                        |
-| `pnpm test:e2e`     | Run Playwright E2E tests.                        |
+| Command             | What it does                                                                                       |
+| ------------------- | -------------------------------------------------------------------------------------------------- |
+| `pnpm dev`          | Start the Next.js dev server (Turbopack).                                                          |
+| `pnpm build`        | Production build.                                                                                  |
+| `pnpm start`        | Run the production build locally.                                                                  |
+| `pnpm lint`         | ESLint over the project.                                                                           |
+| `pnpm format`       | Run Prettier in write mode.                                                                        |
+| `pnpm format:check` | Run Prettier in check mode (used by CI).                                                           |
+| `pnpm typecheck`    | `tsc --noEmit` — type-check without emitting JS.                                                   |
+| `pnpm test`         | Run Vitest unit tests once.                                                                        |
+| `pnpm test:watch`   | Run Vitest in watch mode.                                                                          |
+| `pnpm test:e2e`     | Run Playwright E2E tests.                                                                          |
+| `pnpm check`        | Run the CI `check` job locally: lint + format:check + typecheck + vitest. Run this before pushing. |
+| `pnpm check:e2e`    | `pnpm check` plus the Playwright E2E tests.                                                        |
 
 For local E2E: `pnpm exec playwright install` once to download browser binaries.
 
