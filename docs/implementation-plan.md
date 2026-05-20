@@ -87,14 +87,76 @@ This document is the plan-of-record for *how* and *in what order* the build happ
 
 ## Phase 1 — Public Marketing Site
 
-> Static frontend: home, about, galleries, contact, etc. Content can be hard-coded or stubbed at this stage.
+> The full public-facing site: 14 routes, mobile-responsive, fully navigable, with dev-authored content and real images. No CMS yet — class/bulletin data ships as static placeholders to be wired up in Phase 2.
 
-- **Goals:** _TBD_
-- **ADRs realized:** _TBD_
-- **Scope (in):** _TBD_
-- **Scope (out):** _TBD_
-- **Exit criteria:** _TBD_
-- **Open questions:** _TBD_
+- **Goals:** Stand up every public route the studio's site needs, with real (migrated) content visible and real images served from their permanent storage location. Layouts are mobile-responsive from the start, not retrofitted. SEO surface (sitemap, per-page metadata, JSON-LD) is intentionally deferred to Phase 4 to keep this phase focused on shipping a navigable site.
+
+- **ADRs realized:**
+  - [ADR-0007](./decisions/0007-image-pipeline-and-storage.md) — Supabase Storage for dev-managed and (future) admin-uploaded images, `next/image` optimization
+  - [ADR-0008](./decisions/0008-styling-and-ui-layer.md) — Tailwind + shadcn patterns put into use (component primitives, layout chrome)
+  - [ADR-0017](./decisions/0017-content-modeling-patterns-catalog.md) — Patterns catalog as dev-managed TS module + `/public/patterns/[category]/`
+
+- **Page inventory (14 routes):**
+  - 9 conventional: `/`, `/cabinet-doors`, `/classes`, `/classes/calendar`, `/contact`, `/custom-design`, `/portfolio`, `/repairs`, `/supplies`
+  - 5 patterns: `/supplies/patterns`, `/supplies/patterns/beginner`, `/supplies/patterns/intermediate`, `/supplies/patterns/advanced`, `/supplies/patterns/mirrors-and-frames`
+
+- **Slicing:** by system / workstream, strictly sequential A → B → C → D (mirrors Phase 0's A–F shape).
+
+- **Scope (in):**
+
+  **Chunk A — Supabase Storage setup + image migration**
+  1. Create Supabase project under the 10xDev organization, region paired with Vercel's `sfo1`.
+  2. Create the `site-images` bucket per [ADR-0007](./decisions/0007-image-pipeline-and-storage.md): public-read for all assets, RLS write policy gating uploads to authenticated users (write surface won't be exercised until Phase 2).
+  3. Decide bucket subfolder convention for content slugs not enumerated in ADR-0007 (cabinet-doors, custom-design, repairs, supplies, contact, home). Likely slug-based subfolders to mirror routes.
+  4. One-time Node migration script in `scripts/` that walks `content/<slug>/images/` recursively and uploads each file to the appropriate bucket subfolder. Idempotent / re-runnable. Uses the service-role key from a local-only `.env` (never committed).
+  5. Install `@supabase/supabase-js` (production dep for future Phase 2 use; only the migration script uses it in Phase 1).
+  6. `NEXT_PUBLIC_SUPABASE_URL` wired into `.env.example` and Vercel env vars.
+  7. Add Supabase Storage host to `images.remotePatterns` in `next.config.ts` so `next/image` can fetch and optimize.
+
+  **Chunk B — Layout shell + navigation**
+  1. Root layout chrome: header (logo, primary nav, contact CTA), footer (contact info, copyright, social if applicable). All using brand tokens defined in `globals.css`; no hex literals per the working rule.
+  2. Mobile nav (hamburger or drawer pattern, accessible).
+  3. Responsive breakpoints baseline (Tailwind defaults: `sm`, `md`, `lg`, `xl`). Layout chrome works cleanly across mobile / tablet / desktop.
+  4. Shared layout primitives in `src/components/` (Container, SectionHeader, etc. — added incrementally as content chunks need them).
+  5. Pull in shadcn primitives as needed (likely Button, Sheet/Dialog for mobile nav, NavigationMenu). Each via `pnpm dlx shadcn@latest add <name>`.
+
+  **Chunk C — Content routes (9 conventional pages)**
+  1. One route per slug in `src/app/`. Each route's content is manually converted from `content/<slug>/content.md` into JSX during this chunk. Extraction artifacts (stray `9` tokens, etc.) are cleaned up at conversion time.
+  2. Image references resolved to Supabase Storage URLs via `next/image` with explicit `width`/`height` props (no auto-detection since these are remote).
+  3. Each route inherits the layout chrome from Chunk B and is mobile-responsive at the route level.
+  4. `/classes/calendar` ships as a static placeholder reflecting the current `content.md` snapshot — the dynamic CMS wiring lands in Phase 2.
+  5. Cosmetic favicon.ico added (resolves the existing 404).
+
+  **Chunk D — Patterns catalog routes (5 routes)**
+  1. `lib/patterns.ts` typed array per [ADR-0017](./decisions/0017-content-modeling-patterns-catalog.md). One `Pattern` record per catalog entry across all four categories (~165 total).
+  2. Pattern images moved to `/public/patterns/[category]/` (preserving source `.gif` / `.jpg` extensions per ADR-0017). Source images come from `content/supplies/patterns/[category]/images/`.
+  3. `/supplies/patterns` landing page: brief intro, four category entry cards, copyright notice, ordering instructions ("Email or call to order any pattern by its number"). No per-pattern CTA per ADR-0017.
+  4. `/supplies/patterns/[category]` (×4): grid of pattern thumbnails using `next/image`, sorted by natural-numeric `number` ascending. Click opens a lightbox (image + number + price). No per-pattern URL.
+  5. All five routes mobile-responsive.
+
+- **Scope (out):**
+  - SEO surface — `app/sitemap.ts`, per-page `metadata` exports, LocalBusiness JSON-LD, OG image asset ([ADR-0019](./decisions/0019-seo-and-schema-markup.md), deferred to Phase 4).
+  - Auth, admin dashboard, database schema ([ADRs 0004–0006](./decisions/), Phase 2).
+  - Class data wired to a real source (Phase 2; Phase 1 ships static placeholder).
+  - Bulletin board ([ADR-0016](./decisions/0016-content-modeling-bulletin-board.md), Phase 2).
+  - Contact form submission, transactional email, newsletter ([ADRs 0009–0011](./decisions/), Phase 3).
+  - Analytics, monitoring, URL redirects from the legacy WordPress site ([ADRs 0012](./decisions/0012-analytics-and-monitoring.md), [0018](./decisions/0018-url-redirects-and-migration.md), Phase 4).
+  - Content rendering pipeline (no `react-markdown` / MDX / remark) — content is converted manually once during Chunk C and lives as JSX in route files thereafter.
+
+- **Exit criteria:**
+  - All 14 routes render with their migrated content and reach a `200` on the deployed Vercel URL.
+  - Non-pattern images load from Supabase Storage; pattern images load from `/public/patterns/[category]/`.
+  - Every route is reachable from the header/footer nav on every other route — site is fully navigable without typing URLs.
+  - Each route renders cleanly at mobile (`375px`), tablet (`768px`), and desktop (`1280px`) widths with no horizontal scroll.
+  - `pnpm check` and `pnpm test:e2e` (Playwright smoke) pass locally and in CI. E2E smoke is expanded from "home renders" to a navigation walk through each top-level route.
+  - No console errors on any route in production build.
+
+- **Open questions:**
+  - **Bucket subfolder layout** for content slugs not enumerated in ADR-0007 (cabinet-doors, custom-design, repairs, supplies, contact, home) — decide during Chunk A.
+  - **Specific nav items and footer content** — derive from demo / studio inputs during Chunk B.
+  - **Mobile nav pattern** (hamburger vs. drawer vs. sheet) — pick during Chunk B based on the demo's visual language.
+  - **`/classes/calendar` placeholder shape** — what does the static placeholder say while we wait for the Phase 2 wiring? Decide during Chunk C.
+  - **Pattern record authoring** — `lib/patterns.ts` needs `number` + `price` per record across ~165 entries. Source the numbering from existing image filenames; price comes from… (TBD — Allen, current catalog?). Decide before Chunk D starts.
 
 ---
 
@@ -153,7 +215,7 @@ Items that span phases and need a home regardless of where they land:
 | Phase | Status |
 |---|---|
 | 0 — Foundation | **Complete** (Chunks A–F shipped 2026-05-20) |
-| 1 — Public Marketing Site | Not started |
+| 1 — Public Marketing Site | Scoped — Chunks A–D defined, execution not yet started |
 | 2 — Admin / CMS | Not started |
 | 3 — Forms & Integrations | Not started |
 | 4 — Analytics, Monitoring & Launch | Not started |
