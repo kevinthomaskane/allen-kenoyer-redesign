@@ -39,6 +39,8 @@ This directory contains Architecture Decision Records (ADRs) for the Allen Kenoy
 | [0017](./0017-content-modeling-patterns-catalog.md) | Content modeling — patterns catalog (TS module + static /public images, grid + lightbox, no per-pattern URL) | Accepted |
 | [0018](./0018-url-redirects-and-migration.md) | URL redirect & WordPress migration strategy (next.config.ts redirects, trailingSlash: true, 301s, hard cutover) | Accepted |
 | [0019](./0019-seo-and-schema-markup.md) | SEO & schema markup approach (LocalBusiness composite + Course per class, schema-dts, app/sitemap.ts, CI validation) | Accepted |
+| [0020](./0020-google-calendar-integration.md) | Google Calendar integration (one-way DB → GCal sync, per-session events, service account auth, DB-wins failure handling) | Proposed |
+| [0021](./0021-admin-class-workflow-ux.md) | Admin class workflow UX (class-centric IA, dual entry points, `kind` enum, recurring builder + per-row edits) | In Discussion |
 
 ADR numbers (`0001`, `0002`, …) are assigned as each decision is accepted, in chronological order. The Pending list above will shrink as decisions move into their own files; new decisions can be added to it at any time.
 
