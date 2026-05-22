@@ -11,7 +11,7 @@ The site has two distinct image sources:
 1. **Developer-managed images** — pattern catalog (~165+ thumbnails across 4 difficulty levels), portfolio gallery, "more custom photos" gallery (~22 images), homepage/marketing imagery. These are loaded once during development and rarely change.
 2. **Admin-uploaded images** — class images, uploadable and replaceable by the studio manager via the admin dashboard.
 
-The admin-upload requirement was a scope clarification during this ADR's discussion: it adds an `image_url` (or similar) field to the `Class` content type (to be recorded in [ADR-0010: Content modeling — classes](#) when written) and requires the admin dashboard to support image upload. This does not change the architecture of [ADR-0004](./0004-admin-dashboard-architecture.md) — still 2 content types, still custom-built admin, still flat permissions — only the Class schema grows.
+The admin-upload requirement was a scope clarification during this ADR's discussion: it adds an `image_url` (or similar) field to the `Class` content type (recorded in [ADR-0015: Content modeling — classes](./0015-content-modeling-classes.md)) and requires the admin dashboard to support image upload. This does not change the architecture of [ADR-0004](./0004-admin-dashboard-architecture.md) — still 2 content types, still custom-built admin, still flat permissions — only the Class schema grows.
 
 [ADR-0005](./0005-database-and-query-layer.md) locked Supabase Pro, which includes 100GB of Storage. Total image volume for this site is on the order of hundreds of megabytes — orders of magnitude under that limit.
 

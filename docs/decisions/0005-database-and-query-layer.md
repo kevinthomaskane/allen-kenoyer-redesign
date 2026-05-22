@@ -75,4 +75,4 @@ This ADR bundles four tightly-coupled calls:
 ## Related decisions
 
 - Depends on: [ADR-0001](./0001-frontend-framework.md), [ADR-0002](./0002-hosting-platform.md), [ADR-0004](./0004-admin-dashboard-architecture.md).
-- Influences: Authentication (Supabase Auth becomes the natural default for [ADR-0006](#) — to be decided separately), Image pipeline & storage (Supabase Storage becomes the natural default for image hosting — to be decided separately), Content modeling — classes / bulletin board (schemas will live in `supabase/migrations/`).
+- Influences: Authentication ([ADR-0006](./0006-authentication.md) — Supabase Auth is the natural pairing), Image pipeline & storage ([ADR-0007](./0007-image-pipeline-and-storage.md) — Supabase Storage is the natural pairing), Content modeling — classes ([ADR-0015](./0015-content-modeling-classes.md)) and bulletin board ([ADR-0016](./0016-content-modeling-bulletin-board.md)) (schemas live in `supabase/migrations/`).

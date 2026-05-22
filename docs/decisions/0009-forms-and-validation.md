@@ -8,12 +8,12 @@
 
 The site has two distinct categories of forms:
 
-- **Public-site forms** — contact form, custom-design inquiry, repair inquiry, newsletter signup. Low-traffic, low-stakes, all destined for delivery to the studio (mechanism TBD in [ADR-0010](#)).
+- **Public-site forms** — contact form, custom-design inquiry, repair inquiry, newsletter signup. Low-traffic, low-stakes, all destined for delivery to the studio (mechanism decided in [ADR-0010](./0010-form-submission-and-transactional-email.md); note that newsletter signup is carved out of that pipeline per [ADR-0011](./0011-newsletter-esp-integration.md) and bypasses our backend).
 - **Admin forms** — login ([ADR-0006](./0006-authentication.md)), class editor (12+ fields per [current-pages-for-kristin.txt]), bulletin editor, password reset. Higher-stakes, write to the database.
 
 [ADR-0008](./0008-styling-and-ui-layer.md) locked shadcn/ui as the component primitives layer, and shadcn ships a `<Form>` component that's a thin wrapper around React Hook Form + Zod. That makes the conventional pairing the path of least resistance, but not automatic.
 
-This ADR covers the **form-building layer only**: validation schemas, form state management, and field-component composition. The **submission pipeline** (Server Actions vs third-party form services, email delivery, etc.) is [ADR-0010](#).
+This ADR covers the **form-building layer only**: validation schemas, form state management, and field-component composition. The **submission pipeline** (Server Actions vs third-party form services, email delivery, etc.) is [ADR-0010](./0010-form-submission-and-transactional-email.md).
 
 ## Options considered
 
@@ -35,7 +35,7 @@ Three bundled calls:
 2. **Form library:** React Hook Form (`react-hook-form`).
 3. **Field/error UX:** shadcn's `<Form>` wrapper components — `<FormField>`, `<FormItem>`, `<FormLabel>`, `<FormControl>`, `<FormDescription>`, `<FormMessage>` — for every form in the project (public site and admin alike).
 
-**Implication:** form components are `'use client'` since RHF runs in the client. Submission *handlers* (the action invoked on submit) are Server Actions or fetch calls — to be decided per-form in [ADR-0010](#) and the dev guide.
+**Implication:** form components are `'use client'` since RHF runs in the client. Submission *handlers* (the action invoked on submit) are Server Actions per [ADR-0010](./0010-form-submission-and-transactional-email.md); per-form specifics live in the dev guide.
 
 **Schema reuse pattern:** Each form has a single Zod schema used in three places — the RHF `useForm({ resolver: zodResolver(schema) })`, the Server Action's server-side validation, and (where useful) the database row shape. Schema files live colocated with their feature (e.g., `app/admin/classes/schema.ts`) — exact path conventions are dev-guide level.
 
@@ -56,4 +56,4 @@ Three bundled calls:
 ## Related decisions
 
 - Depends on: [ADR-0008](./0008-styling-and-ui-layer.md) (shadcn provides the `<Form>` wrappers we lean on).
-- Influences: [ADR-0010 — Form submission & transactional email](#) (every form's submit handler is decided there), Content modeling — classes / bulletin board (admin form schemas mirror table schemas), Login UI ([ADR-0006](./0006-authentication.md)) (login form uses this stack).
+- Influences: [ADR-0010 — Form submission & transactional email](./0010-form-submission-and-transactional-email.md) (every form's submit handler is defined there), Content modeling — classes ([ADR-0015](./0015-content-modeling-classes.md)) and bulletin board ([ADR-0016](./0016-content-modeling-bulletin-board.md)) (admin form schemas mirror table schemas), Login UI ([ADR-0006](./0006-authentication.md)) (login form uses this stack).

@@ -43,7 +43,7 @@ This ADR bundles five related calls:
 
 **Authorization enforcement (two layers):**
 - **Application layer:** All `/admin/*` routes are protected by middleware that checks for a valid Supabase session. Unauthenticated requests redirect to `/admin/login`.
-- **Database layer (defense-in-depth):** RLS policies on the `classes` and `bulletins` tables. Public anonymous reads allowed on rows where `published = true` (and within `display_dates` for bulletins). Writes (`INSERT`/`UPDATE`/`DELETE`) restricted to authenticated users. Specific RLS policy SQL lives in the content-modeling ADRs ([0011](#), [0012](#)) and migration files.
+- **Database layer (defense-in-depth):** RLS policies on the `classes` and `bulletins` tables. Public anonymous reads allowed on rows where `published = true` (and within the active display window for bulletins). Writes (`INSERT`/`UPDATE`/`DELETE`) restricted to authenticated users. Specific RLS policy SQL lives in the content-modeling ADRs ([ADR-0015](./0015-content-modeling-classes.md), [ADR-0016](./0016-content-modeling-bulletin-board.md)) and migration files.
 
 ## Rationale
 
@@ -58,7 +58,7 @@ This ADR bundles five related calls:
 - **Vendor coupling to Supabase deepens.** DB ([0005](./0005-database-and-query-layer.md)) + Auth (this ADR) now both depend on Supabase. Moving off would require migrating both the data and the user identities. Acceptable; the Pro plan economics make migration unlikely.
 - **No transferable auth-library experience accrued.** Auth.js skills are more transferable to other companies; choosing Supabase Auth trades that for integration depth. Consistent with the same tradeoff accepted in [ADR-0005](./0005-database-and-query-layer.md) for `supabase-js` over an ORM.
 - **Email + password requires a password reset flow.** Standard Supabase function, but a UI page must be built. Not a real cost, just an item on the dev guide checklist.
-- **Email-delivery dependency for password resets.** Supabase Auth sends reset emails via its own SMTP by default; for production we should configure a custom SMTP provider (probably the one we pick for [ADR-0009: Form submission & transactional email](#) — TBD). Acceptable to use Supabase's default emails until that ADR is decided.
+- **Email-delivery dependency for password resets.** Supabase Auth sends reset emails via its own SMTP by default; for production we configure a custom SMTP provider — Resend, per [ADR-0010: Form submission & transactional email](./0010-form-submission-and-transactional-email.md). Acceptable to use Supabase's default emails until the Resend integration ships (Phase 3).
 - **Session refresh on every server request** that touches a protected route. Acceptable overhead.
 
 ## Related decisions

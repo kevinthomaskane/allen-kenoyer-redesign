@@ -69,4 +69,4 @@ Four bundled calls:
 ## Related decisions
 
 - Depends on: [ADR-0001](./0001-frontend-framework.md) (Next.js + React + App Router), [ADR-0004](./0004-admin-dashboard-architecture.md) (shared UI vocabulary between admin and public site).
-- Influences: All UI work in subsequent phases. Forms & validation ([ADR-0009 pending](#)) will use shadcn's `<Form>` + `<Input>` + `<Button>` primitives. The login UI ([ADR-0006](./0006-authentication.md)) and admin CRUD forms ([ADR-0004](./0004-admin-dashboard-architecture.md)) both build on shadcn components.
+- Influences: All UI work in subsequent phases. Forms & validation ([ADR-0009](./0009-forms-and-validation.md)) uses shadcn's `<Form>` + `<Input>` + `<Button>` primitives. The login UI ([ADR-0006](./0006-authentication.md)) and admin CRUD forms ([ADR-0004](./0004-admin-dashboard-architecture.md)) both build on shadcn components.
