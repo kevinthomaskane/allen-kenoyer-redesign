@@ -30,4 +30,5 @@ pnpm-debug.log*
 # editor / MCP local state
 .playwright-mcp/
 .mcp.json
+.claude/
 
