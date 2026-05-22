@@ -100,7 +100,7 @@ _(To be expanded as remaining open questions resolve. Captured here for the deci
 
 - Depends on: [ADR-0004](./0004-admin-dashboard-architecture.md) (admin platform), [ADR-0015](./0015-content-modeling-classes.md) (class data model — `kind` column proposed below).
 - Influences: Phase 2 of [`implementation-plan.md`](../implementation-plan.md) (the admin chunks will execute against this workflow), future SEO/schema markup work (the `kind` distinction may affect whether single-session offerings emit `Event` vs `Course` JSON-LD — to be revisited in the [ADR-0019](./0019-seo-and-schema-markup.md) implementation).
-- Coordinates with: [ADR-0020](./0020-google-calendar-integration.md) (Proposed) — both this ADR and ADR-0020 propose amendments to [ADR-0015](./0015-content-modeling-classes.md)'s `cohorts` schema, with overlapping treatment of `label`. When both accept, the two amendment blocks should be merged into a single coherent block in ADR-0015.
+- Coordinates with: [ADR-0020](./0020-google-calendar-integration.md) (Accepted 2026-05-22) — ADR-0020's amendment to [ADR-0015](./0015-content-modeling-classes.md) is now in place (`label` NOT NULL dropped, three sync columns added on `cohort_sessions`). This ADR's `kind` column is complementary; when accepted, its amendment lands as a second section in ADR-0015 alongside the 2026-05-22 amendment.
 
 ## On acceptance — amendment to drop into ADR-0015
 
@@ -118,6 +118,6 @@ When this ADR moves from In Discussion to Accepted, paste the block below into [
 >
 > **Field semantics revised by this amendment:**
 >
-> - `label` semantics narrow: required for `kind = 'multi_session'`, optional/auto-generated for `kind = 'single_session'` (single-session workshops do not need a human-meaningful cohort label; the date and time serve as identification). If [ADR-0020](./0020-google-calendar-integration.md) is also Accepted, its `label`-nullable change covers the database constraint; the row above covers the `kind`-conditional rule the admin and renderer enforce.
+> - `label` semantics narrow: required for `kind = 'multi_session'`, optional/auto-generated for `kind = 'single_session'` (single-session workshops do not need a human-meaningful cohort label; the date and time serve as identification). [ADR-0020](./0020-google-calendar-integration.md)'s 2026-05-22 amendment already dropped the database-level `NOT NULL` constraint on `label`; this amendment adds the `kind`-conditional rule that the admin and renderer enforce on top of that constraint relaxation.
 >
 > **Tradeoff:** Converting a single-session workshop into a multi-session cohort (or vice versa) requires deleting and recreating the cohort, since `kind` is immutable. Acceptable; conversion would be rare and the data model treats them as distinct kinds.

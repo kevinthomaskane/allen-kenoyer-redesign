@@ -37,13 +37,13 @@ No double entry. No risk of the website saying one thing and Google Calendar say
 Each session of each class becomes its own event on your calendar. Here's what one event will look like:
 
 **Event title:**
-> Beginning Copper Foil — Tuesdays — Session 3 of 5
+> Beginning Copper Foil — Tuesdays — Class 3 of 5
 
 For a one-off single-session class, the title is simpler:
 > 3-D Beveled Star — Saturday March 14
 
 If the cohort is sold out, the title gets a tag at the front:
-> [SOLD OUT] Beginning Copper Foil — Tuesdays — Session 3 of 5
+> [SOLD OUT] Beginning Copper Foil — Tuesdays — Class 3 of 5
 
 **Event description** (what students see when they click the event):
 
@@ -54,7 +54,7 @@ If the cohort is sold out, the title gets a tag at the front:
 >
 > Prerequisite: None
 > Tuition: $150
-> Supply fee: $15
+> Kit/Supply fee: $15
 > Notes: + glass at cost
 > Class size: max 7 students
 >
@@ -64,10 +64,10 @@ If the cohort is sold out, the title gets a tag at the front:
 
 **Event color:** each class category gets its own color, so the calendar is easy to scan at a glance:
 
-- Stained glass classes — blue
-- Mosaic classes — orange
+- Stained glass classes — red
+- Mosaic classes — green
 - Fused glass classes — purple
-- Other — gray
+- Other — orange
 
 ---
 

@@ -116,6 +116,26 @@ Slugs are auto-generated from `name` on every save (kebab-case, stripped of non-
 - **`enrollment_count` is admin-trust.** No system enforces consistency between it and any external roster Kristin keeps. It's a planning aid, not a reservation system.
 - **No history of past cohorts as a feature.** Expired cohorts persist accidentally; if Kristin deletes them, that history is gone with no recovery. Acceptable because the project scope does not include analytics or historical reporting on classes.
 
+## Amendment 2026-05-22 — Schema additions for Google Calendar integration
+
+Per [ADR-0020](./0020-google-calendar-integration.md), integrating class data with Kristin's public Google Calendar requires three additive columns and one column relaxation against this ADR's schema. The amendment is non-breaking; existing rows take the new defaults / null values cleanly.
+
+**`cohort_sessions`** — three new columns:
+
+| Field | Type | Notes |
+|---|---|---|
+| `gcal_event_id` | text (nullable) | The ID returned by Google Calendar when an event is created for this session. Null when the session has never been synced (e.g., parent cohort is draft). |
+| `sync_status` | text (enum-checked: `synced` \| `pending` \| `failed`) | Per-row sync state. Defaults to `pending` on insert. |
+| `sync_error` | text (nullable) | Last error message from a failed push. Cleared on successful sync. |
+
+**`cohorts.label`** — type unchanged, `NOT NULL` constraint dropped:
+
+| Field | Change | Notes |
+|---|---|---|
+| `label` | required → optional | Required for multi-session cohorts (used to distinguish concurrent runs); optional for one-off single-session cohorts where the session date already disambiguates. The public visibility rule and admin views are unchanged. |
+
+**Rationale note on `enrollment_count`.** This ADR's original framing — *"admin-only planning aid. Never displayed publicly"* — remains true for the value itself. The sold-out title prefix introduced by [ADR-0020](./0020-google-calendar-integration.md) does, however, make `enrollment_count`'s *consequences* public: when `enrollment_count >= max_students`, every Google Calendar event for the affected cohort is prefixed `[SOLD OUT]`. The count number is still never displayed; the derived sold-out state is.
+
 ## Related decisions
 
 - Depends on: [ADR-0004](./0004-admin-dashboard-architecture.md) (defines class as one of the two admin-managed content types), [ADR-0005](./0005-database-and-query-layer.md) (Postgres + Supabase CLI migrations will implement this schema), [ADR-0007](./0007-image-pipeline-and-storage.md) (Supabase Storage backs the optional class image).

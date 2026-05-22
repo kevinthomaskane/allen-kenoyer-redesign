@@ -1,7 +1,7 @@
 # ADR-0020: Google Calendar integration
 
-- **Status:** Proposed
-- **Date:** 2026-05-21
+- **Status:** Accepted
+- **Date:** 2026-05-22
 - **Deciders:** Kevin Kane
 
 ## Context
@@ -85,8 +85,8 @@ This ADR bundles six calls:
 
 **Title format**
 
-- Multi-session cohort: `{class.name} — {cohort.label} — Session {n} of {total}`
-- Single-session cohort: `{class.name} — {formatted session date}` (no "Session N of M" suffix)
+- Multi-session cohort: `{class.name} — {cohort.label} — Class {n} of {total}`
+- Single-session cohort: `{class.name} — {formatted session date}` (no "Class N of M" suffix)
 - Sold-out prefix (when applicable): `[SOLD OUT] ` prepended to the title
 
 `n` is the session's chronological position (1-based, ordered by `starts_at` within the cohort). When a session's date changes such that ordinals shift among siblings, every affected session's title is re-pushed to GCal.
@@ -101,10 +101,9 @@ Category: {class.category}
 
 Prerequisite: {class.prerequisite}      ← omitted if null
 Tuition: ${class.tuition}
-Supply fee: ${class.supply_fee}         ← omitted if null
-Kit fee: ${class.kit_fee}               ← omitted if null
-Notes: {class.fee_notes}                ← omitted if null
-Class size: max {class.max_students}    ← omitted if null
+Kit/Supply fee: ${supply_fee + kit_fee}  ← combined; line omitted if both fields null, otherwise shows the sum (treating a null field as 0)
+Notes: {class.fee_notes}                 ← omitted if null
+Class size: max {class.max_students}     ← omitted if null
 
 Full details: https://allenkenoyerglass.com/classes/{class.slug}/
 ```
@@ -117,10 +116,10 @@ Conditional fields hide cleanly when null — no "N/A" placeholders. `enrollment
 
 | Category | GCal named color |
 |---|---|
-| `stained_glass` | Peacock (blue) |
-| `mosaic` | Tangerine (orange) |
-| `fused_glass` | Lavender (light purple) |
-| `other` | Graphite (gray) |
+| `stained_glass` | Tomato (red) |
+| `mosaic` | Basil (green) |
+| `fused_glass` | Grape (purple) |
+| `other` | Tangerine (orange) |
 
 ### Propagation rules
 
@@ -157,7 +156,7 @@ The sold-out marker introduced here gives `cohort.enrollment_count` public-facin
 - **DB-wins failure semantics keep the admin operational under upstream outage.** A strict transactional model would make a transient Google outage block class management entirely. Surfacing per-row sync status with a one-click retry recovers the same correctness guarantee asynchronously, at the cost of accepting brief drift windows.
 - **"Sync all" as a permanent feature pays double dividends.** It's the launch-time backfill mechanism *and* the recovery tool when sync state drifts for any other reason. Building it once as a first-class feature is no more work than a throwaway script and leaves operational headroom.
 - **Plain-text descriptions render consistently across calendar clients.** GCal supports light HTML in descriptions, but rendering varies (web vs. iOS vs. Android vs. third-party clients). Plain text with line breaks and auto-linkified URLs is consistent everywhere.
-- **Per-category colors give viewers a scannable visual signal** without leaking any data the title doesn't already convey. The mapping (Peacock / Tangerine / Lavender / Graphite) was picked for visual separability across the four categories.
+- **Per-category colors give viewers a scannable visual signal** without leaking any data the title doesn't already convey. The mapping (Tomato / Basil / Grape / Tangerine) is set by studio preference; the four GCal named colors are well-separated in hue across the palette.
 
 ## Tradeoffs accepted
 
@@ -176,26 +175,6 @@ The sold-out marker introduced here gives `cohort.enrollment_count` public-facin
 - Influences: Phase 2 of [`implementation-plan.md`](../implementation-plan.md) (GCal integration ships alongside the CMS rollout); future Phase 2 work on `/classes/[slug]` rendering (sold-out treatment on the public site).
 - Amends: [ADR-0015](./0015-content-modeling-classes.md) (additive — three new columns on `cohort_sessions`, `cohorts.label` relaxed to nullable, public-facing consequence of `enrollment_count` via sold-out marker).
 
-## On acceptance — amendment to drop into ADR-0015
+## Amendment landed in ADR-0015 on acceptance
 
-When this ADR moves from Proposed to Accepted, paste the block below into [ADR-0015](./0015-content-modeling-classes.md) as a new section between "Tradeoffs accepted" and "Related decisions" (matching the placement convention used for [ADR-0014's amendment](./0014-linting-and-formatting.md#amendment-2026-05-20--eslint-9x-vs-10x)). Fill in the date with the day 0020 is Accepted.
-
-> ### Amendment YYYY-MM-DD — schema additions for Google Calendar integration
->
-> Per [ADR-0020](./0020-google-calendar-integration.md), integrating class data with Kristin's public Google Calendar requires three additive columns and one column relaxation against this ADR's schema. The amendment is non-breaking; existing rows take the new defaults / null values cleanly.
->
-> **`cohort_sessions`** — three new columns:
->
-> | Field | Type | Notes |
-> |---|---|---|
-> | `gcal_event_id` | text (nullable) | The ID returned by Google Calendar when an event is created for this session. Null when the session has never been synced (e.g., parent cohort is draft). |
-> | `sync_status` | text (enum-checked: `synced` \| `pending` \| `failed`) | Per-row sync state. Defaults to `pending` on insert. |
-> | `sync_error` | text (nullable) | Last error message from a failed push. Cleared on successful sync. |
->
-> **`cohorts.label`** — type unchanged, `NOT NULL` constraint dropped:
->
-> | Field | Change | Notes |
-> |---|---|---|
-> | `label` | required → optional | Required for multi-session cohorts (used to distinguish concurrent runs); optional for one-off single-session cohorts where the session date already disambiguates. The public visibility rule and admin views are unchanged. |
->
-> **Rationale note on `enrollment_count`.** This ADR's original framing — *"admin-only planning aid. Never displayed publicly"* — remains true for the value itself. The sold-out title prefix introduced by [ADR-0020](./0020-google-calendar-integration.md) does, however, make `enrollment_count`'s *consequences* public: when `enrollment_count >= max_students`, every Google Calendar event for the affected cohort is prefixed `[SOLD OUT]`. The count number is still never displayed; the derived sold-out state is.
+When this ADR moved from Proposed to Accepted on 2026-05-22, the schema amendment it specified was applied to [ADR-0015](./0015-content-modeling-classes.md) as `### Amendment 2026-05-22 — Schema additions for Google Calendar integration`. The amendment is non-breaking: three additive columns on `cohort_sessions` (`gcal_event_id`, `sync_status`, `sync_error`), `cohorts.label` relaxed from required to nullable, and a clarifying rationale note about `enrollment_count`'s now-public consequences via the sold-out title prefix. See ADR-0015 for the full amendment text.
