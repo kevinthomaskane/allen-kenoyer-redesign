@@ -30,7 +30,7 @@ Constraints that apply:
 
 ### Image storage
 
-- **Static in `/public/patterns/[category]/...`.** Build-time optimization via `next/image`. No DB, no API call, no runtime dependency.
+- **Static in `/public/patterns/[category]/...`.** Build-time optimization via `next/image`. No DB, no API call, no runtime dependency. *See "Amendment 2026-05-22 — Pattern image storage moves to Supabase Storage" below — this option was originally chosen, then reversed.*
 - **Supabase Storage** (consistent with [ADR-0007](./0007-image-pipeline-and-storage.md) for admin-uploaded images). Adds a network hop and migration ceremony for content that never changes outside commits.
 - **Static + pre-generated variants at build time.** Faster first paint, more build complexity.
 
@@ -71,7 +71,7 @@ The minimum is image + a unique identifier. Beyond that:
 
 ### Storage
 
-A single TypeScript module — `lib/patterns.ts` — exports a typed array of all pattern records. Adding a pattern is a code change: drop the image file into `/public/patterns/[category]/`, then append the matching record to the array. The TypeScript type acts as the schema:
+A single TypeScript module — `lib/patterns.ts` — exports a typed array of all pattern records. Adding a pattern is a code change: drop the image file into `/public/patterns/[category]/`, then append the matching record to the array. *See "Amendment 2026-05-22 — Pattern image storage moves to Supabase Storage" below — the image-drop workflow is replaced by a Supabase Storage upload.* The TypeScript type acts as the schema:
 
 ```ts
 type PatternCategory =
@@ -93,7 +93,7 @@ type Pattern = {
 
 ### Image storage
 
-Pattern images live as static assets under `/public/patterns/[category]/`. `next/image` handles responsive sizing and format optimization at build/request time. Extensions are preserved from the source files (mix of `.gif` and `.jpg` is acceptable; `next/image` re-encodes for delivery). No Supabase Storage involvement for the patterns catalog.
+Pattern images live as static assets under `/public/patterns/[category]/`. `next/image` handles responsive sizing and format optimization at build/request time. Extensions are preserved from the source files (mix of `.gif` and `.jpg` is acceptable; `next/image` re-encodes for delivery). No Supabase Storage involvement for the patterns catalog. *See "Amendment 2026-05-22 — Pattern image storage moves to Supabase Storage" below — this section's storage location was reversed; patterns now live in Supabase Storage like the rest of the site's images.*
 
 ### Browsing UX
 
@@ -122,7 +122,7 @@ No technical protection. Images are served at the resolution needed for confiden
 ## Rationale
 
 - **A single TypeScript module beats per-file or per-category alternatives at this scale.** 165 records of 4–5 fields each fit comfortably in one well-formatted file (~1000 lines). A single import target, full type-checking on every record, and trivial filtering/grouping at consumption time. Per-pattern markdown files would be 165 nearly-empty files with no body content — pure ceremony.
-- **Static images in `/public/` are right for this content type.** Patterns never change at runtime, there's no admin upload flow, and `next/image` already optimizes static assets in `/public/` the same way it would Supabase-hosted images. Adding Supabase Storage as a hop would slow first paint without buying anything — the admin convenience [ADR-0007](./0007-image-pipeline-and-storage.md) is built for doesn't apply when the content is dev-managed.
+- **Static images in `/public/` are right for this content type.** Patterns never change at runtime, there's no admin upload flow, and `next/image` already optimizes static assets in `/public/` the same way it would Supabase-hosted images. Adding Supabase Storage as a hop would slow first paint without buying anything — the admin convenience [ADR-0007](./0007-image-pipeline-and-storage.md) is built for doesn't apply when the content is dev-managed. *See "Amendment 2026-05-22 — Pattern image storage moves to Supabase Storage" below — this rationale no longer applies; consistency with ADR-0007's "all site images in one bucket" model now dominates.*
 - **Alphanumeric `number` string** is required by the existing data; the rebuild preserves the studio's existing pattern numbering rather than re-numbering 165 records.
 - **Price field is new** but stays informational. Customers historically called or emailed to ask about prices; surfacing the price on the catalog page removes friction without crossing into e-commerce (no cart, no checkout, no payment). *See "Amendment 2026-05-22" below — the "new" framing was incorrect; the field is preserved from the existing site, not introduced.*
 - **Grid + lightbox** matches how stained glass pattern catalogs are actually used — visual scanning, comparing several at once, zooming into the ones that catch the eye. Detail pages would mean clicking back-and-forth between near-empty pages for a view the lightbox already provides.
@@ -157,3 +157,22 @@ The decision itself stands unchanged: `price: number` remains a required field o
 - **Tradeoffs accepted → "Price field on a non-commerce site could lead a visitor to expect online ordering"** — concern still applies; clear ordering instructions in the lightbox + landing page remain important. What's not true is that the rebuild introduces this risk — the live site already navigates exactly this combination (prices published + conversational ordering).
 
 Authoring source for [Phase 1 Chunk D](../implementation-plan.md#phase-1--public-marketing-site): pattern numbers and prices are both parsed from `content/supplies/patterns/<category>/content.md` to populate the `lib/patterns.ts` records.
+
+## Amendment 2026-05-22 — Pattern image storage moves to Supabase Storage
+
+The original ADR placed pattern images at `/public/patterns/[category]/` and explicitly excluded them from Supabase Storage. That decision is reversed: pattern images now live in Supabase Storage alongside the rest of the site's images, restoring full alignment with [ADR-0007](./0007-image-pipeline-and-storage.md)'s "all site images in one bucket, subfolders by content type" model.
+
+**What changes:**
+
+- **Image storage location:** `/public/patterns/[category]/` → Supabase Storage `site-images` bucket, path `patterns/[category]/<filename>`. `next/image` fetches via the existing `images.remotePatterns` config in `next.config.ts` (per [ADR-0007](./0007-image-pipeline-and-storage.md), already set up in Phase 1 Chunk A).
+- **Authoring workflow:** Adding a pattern is still a code change, but the "drop image into `/public/`" step becomes "upload image to the Supabase Storage bucket" (reuse the same migration-script pattern Phase 1 Chunk A uses for the rest of the site's content images). The `lib/patterns.ts` record's `image` field references the bucket path (or the bare filename, with the bucket prefix applied at render time — an implementation detail for Chunk D).
+- **Rationale shifts:** The original ADR's argument that "static images in `/public/` are right for this content type" no longer applies. The new rationale is consistency: having patterns in one storage location and the rest of the site's images in another adds a special case for no compelling reason. The performance argument was always thin — `next/image` optimizes equally from both sources — and the simpler mental model ("all site images live in Supabase Storage") wins.
+
+**What does not change:**
+
+- The `Pattern` type shape — `number`, `category`, `price`, `image`, optional `alt` are all preserved.
+- `lib/patterns.ts` remains the dev-managed catalog source; only the `image` field's resolved location changes.
+- Sort order (natural-numeric `number` ascending), lightbox UX, "no per-pattern URL", copyright posture — all unchanged.
+- Mixed `.gif` / `.jpg` extensions preserved through migration; `next/image` re-encodes for delivery regardless.
+
+**Implementation note for [Phase 1 Chunk D](../implementation-plan.md#phase-1--public-marketing-site):** pattern images migrate into Supabase Storage during Chunk D, mirroring Chunk A's content-image migration approach. The plan is updated accordingly.

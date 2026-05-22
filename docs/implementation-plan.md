@@ -94,7 +94,7 @@ This document is the plan-of-record for *how* and *in what order* the build happ
 - **ADRs realized:**
   - [ADR-0007](./decisions/0007-image-pipeline-and-storage.md) — Supabase Storage for dev-managed and (future) admin-uploaded images, `next/image` optimization
   - [ADR-0008](./decisions/0008-styling-and-ui-layer.md) — Tailwind + shadcn patterns put into use (component primitives, layout chrome)
-  - [ADR-0017](./decisions/0017-content-modeling-patterns-catalog.md) — Patterns catalog as dev-managed TS module + `/public/patterns/[category]/`
+  - [ADR-0017](./decisions/0017-content-modeling-patterns-catalog.md) — Patterns catalog as dev-managed TS module + Supabase Storage at `patterns/[category]/` (per [Amendment 2026-05-22](./decisions/0017-content-modeling-patterns-catalog.md#amendment-2026-05-22--pattern-image-storage-moves-to-supabase-storage); the original `/public/` decision was reversed)
 
 - **Page inventory (14 routes):**
   - 9 conventional: `/`, `/cabinet-doors`, `/classes`, `/classes/calendar`, `/contact`, `/custom-design`, `/portfolio`, `/repairs`, `/supplies`
@@ -130,7 +130,7 @@ This document is the plan-of-record for *how* and *in what order* the build happ
 
   **Chunk D — Patterns catalog routes (5 routes)**
   1. `lib/patterns.ts` typed array per [ADR-0017](./decisions/0017-content-modeling-patterns-catalog.md). One `Pattern` record per catalog entry across all four categories (~165 total).
-  2. Pattern images moved to `/public/patterns/[category]/` (preserving source `.gif` / `.jpg` extensions per ADR-0017). Source images come from `content/supplies/patterns/[category]/images/`.
+  2. Pattern images uploaded to Supabase Storage at `patterns/[category]/<filename>` (preserving source `.gif` / `.jpg` extensions per ADR-0017). Source images come from `content/supplies/patterns/[category]/images/`. Reuse Chunk A's migration approach — either extend `scripts/migrate-images.mjs` to also walk the nested `content/supplies/patterns/<category>/images/` tree, or invoke a parallel script. Per [ADR-0017 Amendment 2026-05-22](./decisions/0017-content-modeling-patterns-catalog.md#amendment-2026-05-22--pattern-image-storage-moves-to-supabase-storage), the original `/public/` storage decision was reversed in favor of consistency with the rest of the site's images.
   3. `/supplies/patterns` landing page: brief intro, four category entry cards, copyright notice, ordering instructions ("Email or call to order any pattern by its number"). No per-pattern CTA per ADR-0017.
   4. `/supplies/patterns/[category]` (×4): grid of pattern thumbnails using `next/image`, sorted by natural-numeric `number` ascending. Click opens a lightbox (image + number + price). No per-pattern URL.
   5. All five routes mobile-responsive.
@@ -146,13 +146,15 @@ This document is the plan-of-record for *how* and *in what order* the build happ
 
 - **Exit criteria:**
   - All 14 routes render with their migrated content and reach a `200` on the deployed Vercel URL.
-  - Non-pattern images load from Supabase Storage; pattern images load from `/public/patterns/[category]/`.
+  - All images load from Supabase Storage — non-pattern content images at `site-images/<slug>/<filename>` (migrated in Chunk A), pattern images at `site-images/patterns/<category>/<filename>` (migrated in Chunk D per [ADR-0017 Amendment 2026-05-22](./decisions/0017-content-modeling-patterns-catalog.md#amendment-2026-05-22--pattern-image-storage-moves-to-supabase-storage)).
   - Every route is reachable from the header/footer nav on every other route — site is fully navigable without typing URLs.
   - Each route renders cleanly at mobile (`375px`), tablet (`768px`), and desktop (`1280px`) widths with no horizontal scroll.
   - `pnpm check` and `pnpm test:e2e` (Playwright smoke) pass locally and in CI. E2E smoke is expanded from "home renders" to a navigation walk through each top-level route.
   - No console errors on any route in production build.
 
 - **Chunk A resolution (2026-05-22):** Supabase project `allen-kenoyer-glass` (ref `lgbeihhbkwnxykaaebbj`) created under the 10xDev org in `us-west-1` paired with Vercel's `sfo1` per [ADR-0002](./decisions/0002-hosting-platform.md). `site-images` public-read bucket created via SQL migration (`create_site_images_bucket_and_rls`, then `restrict_site_images_select_to_authenticated`); RLS on `storage.objects` grants the `authenticated` role INSERT + SELECT + UPDATE + DELETE scoped by `bucket_id = 'site-images'` — needed because Postgres RLS requires SELECT for UPDATE/DELETE rows to be visible, even though anon reads happen via the bucket's public CDN path (`bucket.public = true`). 117 images migrated from `content/<slug>/images/` to `site-images/<slug>/<filename>` via `scripts/migrate-images.mjs` (run via `pnpm migrate:images`); patterns deliberately excluded per [ADR-0017](./decisions/0017-content-modeling-patterns-catalog.md). `@supabase/supabase-js@2.106.1` installed as a production dep. `next.config.ts` derives the Supabase hostname from `NEXT_PUBLIC_SUPABASE_URL` at build time and configures `images.remotePatterns` to `/storage/v1/object/public/site-images/**`. Two `NEXT_PUBLIC_*` env vars set in Vercel (preview + production); `SUPABASE_SECRET_KEY` (modern replacement for the legacy `service_role` JWT) lives only in local `.env.local` for the migration script. One advisory accepted: `public_bucket_allows_listing` WARN — listing is exposed to `authenticated` only, which in this app means admin users (Kristin) per [ADR-0006](./decisions/0006-authentication.md)'s invite-only auth; SELECT cannot be dropped without breaking future admin UPDATE/DELETE workflows.
+
+- **Note 2026-05-22 (post-Chunk A):** [ADR-0017 Amendment 2026-05-22](./decisions/0017-content-modeling-patterns-catalog.md#amendment-2026-05-22--pattern-image-storage-moves-to-supabase-storage) reversed the pattern-exclusion above. Patterns no longer go in `/public/`; they migrate to the same `site-images` bucket under `patterns/<category>/` during Chunk D, reusing the script pattern from Chunk A. The Chunk A resolution stands as the historical record of what shipped at the time; the migration of the remaining 165 pattern images is Chunk D scope.
 
 - **Open questions:**
   - **Specific nav items and footer content** — derive from demo / studio inputs during Chunk B.
