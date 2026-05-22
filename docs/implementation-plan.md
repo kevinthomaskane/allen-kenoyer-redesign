@@ -152,8 +152,9 @@ This document is the plan-of-record for *how* and *in what order* the build happ
   - `pnpm check` and `pnpm test:e2e` (Playwright smoke) pass locally and in CI. E2E smoke is expanded from "home renders" to a navigation walk through each top-level route.
   - No console errors on any route in production build.
 
+- **Chunk A resolution (2026-05-22):** Supabase project `allen-kenoyer-glass` (ref `lgbeihhbkwnxykaaebbj`) created under the 10xDev org in `us-west-1` paired with Vercel's `sfo1` per [ADR-0002](./decisions/0002-hosting-platform.md). `site-images` public-read bucket created via SQL migration (`create_site_images_bucket_and_rls`, then `restrict_site_images_select_to_authenticated`); RLS on `storage.objects` grants the `authenticated` role INSERT + SELECT + UPDATE + DELETE scoped by `bucket_id = 'site-images'` — needed because Postgres RLS requires SELECT for UPDATE/DELETE rows to be visible, even though anon reads happen via the bucket's public CDN path (`bucket.public = true`). 117 images migrated from `content/<slug>/images/` to `site-images/<slug>/<filename>` via `scripts/migrate-images.mjs` (run via `pnpm migrate:images`); patterns deliberately excluded per [ADR-0017](./decisions/0017-content-modeling-patterns-catalog.md). `@supabase/supabase-js@2.106.1` installed as a production dep. `next.config.ts` derives the Supabase hostname from `NEXT_PUBLIC_SUPABASE_URL` at build time and configures `images.remotePatterns` to `/storage/v1/object/public/site-images/**`. Two `NEXT_PUBLIC_*` env vars set in Vercel (preview + production); `SUPABASE_SECRET_KEY` (modern replacement for the legacy `service_role` JWT) lives only in local `.env.local` for the migration script. One advisory accepted: `public_bucket_allows_listing` WARN — listing is exposed to `authenticated` only, which in this app means admin users (Kristin) per [ADR-0006](./decisions/0006-authentication.md)'s invite-only auth; SELECT cannot be dropped without breaking future admin UPDATE/DELETE workflows.
+
 - **Open questions:**
-  - **Bucket subfolder layout** for content slugs not enumerated in ADR-0007 (cabinet-doors, custom-design, repairs, supplies, contact, home) — decide during Chunk A.
   - **Specific nav items and footer content** — derive from demo / studio inputs during Chunk B.
   - **Mobile nav pattern** (hamburger vs. drawer vs. sheet) — pick during Chunk B based on the demo's visual language.
   - **`/classes/calendar` placeholder shape** — what does the static placeholder say while we wait for the Phase 2 wiring? Decide during Chunk C.
@@ -216,7 +217,7 @@ Items that span phases and need a home regardless of where they land:
 | Phase | Status |
 |---|---|
 | 0 — Foundation | **Complete** (Chunks A–F shipped 2026-05-20) |
-| 1 — Public Marketing Site | Scoped — Chunks A–D defined, execution not yet started |
+| 1 — Public Marketing Site | In progress — Chunk A complete (2026-05-22), Chunks B–D pending |
 | 2 — Admin / CMS | Not started |
 | 3 — Forms & Integrations | Not started |
 | 4 — Analytics, Monitoring & Launch | Not started |
