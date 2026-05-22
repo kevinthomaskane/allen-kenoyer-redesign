@@ -485,7 +485,9 @@ _Call or come into the shop to register. Send Questions to: [classes@allenkenoye
 
 ### **Dot Art 2 – Intermediate**
 
-![](images/classes--WebDApic.jpg)![Owl Dot Art](images/classes--owlDApic.jpg)
+![](images/classes--WebDApic.jpg)
+
+![Owl Dot Art](images/classes--owlDApic.jpg)
 
 This class builds on the Dot Art class using **Colors For Earth** enamel paints.  Using dotting tools continue your experimentation in potillism making larger  
 pieces on glass of your choice.   Includes 1 firing for up to 8″ x  8″ piece.

@@ -41,7 +41,7 @@ The minimum is image + a unique identifier. Beyond that:
 - **Name** — short human-readable label. Current site shows numbers only.
 - **Dimensions** — useful for fitment, would require authoring across 165 records.
 - **Description** — 1–2 sentences each, also authoring overhead.
-- **Price** — current site doesn't publish prices; this would be new for the rebuild.
+- **Price** — current site doesn't publish prices; this would be new for the rebuild. *See "Amendment 2026-05-22" below — this premise was incorrect.*
 
 ### Detail pages vs grid-only
 
@@ -124,7 +124,7 @@ No technical protection. Images are served at the resolution needed for confiden
 - **A single TypeScript module beats per-file or per-category alternatives at this scale.** 165 records of 4–5 fields each fit comfortably in one well-formatted file (~1000 lines). A single import target, full type-checking on every record, and trivial filtering/grouping at consumption time. Per-pattern markdown files would be 165 nearly-empty files with no body content — pure ceremony.
 - **Static images in `/public/` are right for this content type.** Patterns never change at runtime, there's no admin upload flow, and `next/image` already optimizes static assets in `/public/` the same way it would Supabase-hosted images. Adding Supabase Storage as a hop would slow first paint without buying anything — the admin convenience [ADR-0007](./0007-image-pipeline-and-storage.md) is built for doesn't apply when the content is dev-managed.
 - **Alphanumeric `number` string** is required by the existing data; the rebuild preserves the studio's existing pattern numbering rather than re-numbering 165 records.
-- **Price field is new** but stays informational. Customers historically called or emailed to ask about prices; surfacing the price on the catalog page removes friction without crossing into e-commerce (no cart, no checkout, no payment).
+- **Price field is new** but stays informational. Customers historically called or emailed to ask about prices; surfacing the price on the catalog page removes friction without crossing into e-commerce (no cart, no checkout, no payment). *See "Amendment 2026-05-22" below — the "new" framing was incorrect; the field is preserved from the existing site, not introduced.*
 - **Grid + lightbox** matches how stained glass pattern catalogs are actually used — visual scanning, comparing several at once, zooming into the ones that catch the eye. Detail pages would mean clicking back-and-forth between near-empty pages for a view the lightbox already provides.
 - **No per-pattern CTA in the lightbox** because the studio's ordering flow is conversational ("call us and tell us which numbers you want") — a customer often orders several patterns in one inquiry, and surfacing a single-pattern button would push them toward less efficient single-pattern emails.
 - **Numeric-aware sort by `number` ascending** matches how customers think about the catalog ("show me #105 through #110") and keeps adjacent variants (`102C` and `103C`) near each other.
@@ -138,10 +138,22 @@ No technical protection. Images are served at the resolution needed for confiden
 - **No name, dimensions, or description.** The catalog stays sparse. Customers who want details ask the studio. This matches the existing flow and avoids the authoring burden of writing 165 entries' worth of metadata.
 - **Mixed image extensions (`.gif` + `.jpg`).** Acceptable because `next/image` re-encodes images for delivery; the source format doesn't affect output. The `image` field preserves the source extension to avoid surprise breakage during migration.
 - **No technical copyright protection.** Images can be saved by any visitor with browser tools. Acceptable; the studio's risk profile is small (most casual visitors aren't pirating stained glass patterns) and legal recourse remains intact.
-- **Price field on a non-commerce site** could lead a visitor to expect online ordering. The catalog page and lightbox must phrase ordering instructions clearly — "Order by phone or email, reference pattern numbers" — to avoid confusion.
+- **Price field on a non-commerce site** could lead a visitor to expect online ordering. The catalog page and lightbox must phrase ordering instructions clearly — "Order by phone or email, reference pattern numbers" — to avoid confusion. *See "Amendment 2026-05-22" below — the underlying concern still applies, but the risk isn't new with the rebuild; the live site already publishes prices alongside conversational ordering.*
 
 ## Related decisions
 
 - Depends on: [ADR-0004](./0004-admin-dashboard-architecture.md) (designates patterns as developer-managed, not admin), [ADR-0001](./0001-frontend-framework.md) (Next.js + `next/image` enable the static-asset pipeline).
 - Does *not* depend on: [ADR-0005](./0005-database-and-query-layer.md) (no DB involvement), [ADR-0007](./0007-image-pipeline-and-storage.md) (no Supabase Storage involvement for patterns).
 - Influences: URL redirect & migration strategy (next ADR; the live site uses `/patterns/[category]` but the rebuild puts them at `/supplies/patterns/[category]`), SEO & schema markup (later ADR; consider whether `CreativeWork` markup is worthwhile on individual patterns given no detail page).
+
+## Amendment 2026-05-22 — Price field preserved from existing site, not new
+
+The original ADR characterized the `price` field as net-new for the rebuild, based on the live-site inspection at authoring time. That premise was incorrect. The extracted content under `content/supplies/patterns/<category>/content.md` already includes prices for the catalog, formatted as alternating `#<number>` / `$<price>` blocks (e.g., `#102C` → `$6.00`, `#121` → `$10.00`). The rebuild is *preserving* an existing field, not introducing one.
+
+The decision itself stands unchanged: `price: number` remains a required field on the `Pattern` type, surfaced in the lightbox alongside the image and number. The framing that shifts:
+
+- **Options considered → Per-pattern fields** — "current site doesn't publish prices" is false. The current site does publish prices on its category pages.
+- **Rationale → "Price field is new"** — should read "Price field is preserved from the existing site." The "informational, not transactional" framing is still correct.
+- **Tradeoffs accepted → "Price field on a non-commerce site could lead a visitor to expect online ordering"** — concern still applies; clear ordering instructions in the lightbox + landing page remain important. What's not true is that the rebuild introduces this risk — the live site already navigates exactly this combination (prices published + conversational ordering).
+
+Authoring source for [Phase 1 Chunk D](../implementation-plan.md#phase-1--public-marketing-site): pattern numbers and prices are both parsed from `content/supplies/patterns/<category>/content.md` to populate the `lib/patterns.ts` records.

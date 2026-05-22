@@ -66,11 +66,11 @@ Allen Kenoyer Glass offers a wide array of supplies for all of your art glass ne
 -   PreCut shapes
 -   Dichroic Glass
 
-[](https://allenkenoyerglass.com/wp-content/uploads/2021/10/Supplies2mr.jpg)
+![](images/Supplies2mr.jpg)
 
-[](https://allenkenoyerglass.com/wp-content/uploads/2021/10/GlassWall2mr.jpg)
+![](images/GlassWall2mr.jpg)
 
-[](https://allenkenoyerglass.com/wp-content/uploads/2021/10/DisplayWall1_mr.jpg)
+![](images/DisplayWall1_mr.jpg)
 
 ## Images
 - `store-front-01.jpg`

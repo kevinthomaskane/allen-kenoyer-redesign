@@ -7,8 +7,6 @@
 
 We are happy to help you choose glass for cabinet doors. Free free to stop into the studio anytime to see the glass firsthand. Whether you order the glass alone, or have us install it into the cabinet doors, we do not ship doors or glass. If we are installing the glass into the door, you will have to bring the door into the studio. Please remove all of the hardware – the hinges and the handles – before bringing the door in. Either way, the notes below will help you to measure the glass needed for your door and will help in calculating your cost.
 
-9
-
 #### Determine the rough opening size in the cabinet door.
 
 **This is the opening the glass insert will fit into.**
@@ -17,8 +15,6 @@ We are happy to help you choose glass for cabinet doors. Free free to stop into 
 -   Round down this measurement to the nearest sixteenth of an inch. For example: change 12 11/32″ to 12 5/16″.
 -   Now measure the height of the rough opening in the cabinet door.
 -   As before, round down this measurement to the nearest sixteenth of an inch.
-
-9
 
 #### Deduct an additional 1/8" from the width and from the height measurements of the rough opening in your cabinet door.
 

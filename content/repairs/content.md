@@ -11,27 +11,15 @@ Allen Kenoyer Glass does many types of repairs. From small items to full panel r
 
 #### Some items we repair:
 
-9
-
 #### Windows
-
-9
 
 #### Doors
 
-9
-
 #### Sidelites
-
-9
 
 #### Lampshades
 
-9
-
 #### Table Tops
-
-9
 
 #### Stemware
 
@@ -59,15 +47,15 @@ Submit
 
 Below is a cityscape that was badly damaged and brought in for repair. All the blue pieces of tape are broken pieces.
 
-[](https://allenkenoyerglass.com/wp-content/uploads/2021/10/CityBroke3.jpg)
+![](images/CityBroke3.jpg)
 
-[](https://allenkenoyerglass.com/wp-content/uploads/2021/10/CityBroke1.jpg)
+![](images/CityBroke1.jpg)
 
-[](https://allenkenoyerglass.com/wp-content/uploads/2021/10/CityBroke2.jpg)
+![](images/CityBroke2.jpg)
 
 Here is the after photo of the cityscape that was badly damaged and brought in for repair. All the blue pieces of tape have been fixed.
 
-[](https://allenkenoyerglass.com/wp-content/uploads/2021/10/CityFix1.jpg)
+![](images/CityFix1.jpg)
 
 ## Images
 - `CityBroke3.jpg`

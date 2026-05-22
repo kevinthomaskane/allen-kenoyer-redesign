@@ -119,6 +119,7 @@ This document is the plan-of-record for *how* and *in what order* the build happ
   3. Responsive breakpoints baseline (Tailwind defaults: `sm`, `md`, `lg`, `xl`). Layout chrome works cleanly across mobile / tablet / desktop.
   4. Shared layout primitives in `src/components/` (Container, SectionHeader, etc. — added incrementally as content chunks need them).
   5. Pull in shadcn primitives as needed (likely Button, Sheet/Dialog for mobile nav, NavigationMenu). Each via `pnpm dlx shadcn@latest add <name>`.
+  6. Install **Motion** (`motion`, the rebrand of `framer-motion`) for animations — verify current latest version before install. Use the demo's `demo/js/animations.js` as a reference for the animation *vocabulary* (hero background parallax, scroll-triggered enter reveals on sections/cards/grids, page-load staggers on the hero, directional reveals on the about + contact sections), not as a literal port — pixel-perfect parity with the GSAP timings isn't a goal. Map to Motion idioms: `useScroll` + `useTransform` for parallax, `whileInView` (with `once: true`) for reveals, `variants` + `staggerChildren` for staggers, named eases like `backOut` for overshoot. No ADR — decision recorded here in the implementation plan.
 
   **Chunk C — Content routes (9 conventional pages)**
   1. One route per slug in `src/app/`. Each route's content is manually converted from `content/<slug>/content.md` into JSX during this chunk. Extraction artifacts (stray `9` tokens, etc.) are cleaned up at conversion time.
@@ -156,7 +157,7 @@ This document is the plan-of-record for *how* and *in what order* the build happ
   - **Specific nav items and footer content** — derive from demo / studio inputs during Chunk B.
   - **Mobile nav pattern** (hamburger vs. drawer vs. sheet) — pick during Chunk B based on the demo's visual language.
   - **`/classes/calendar` placeholder shape** — what does the static placeholder say while we wait for the Phase 2 wiring? Decide during Chunk C.
-  - **Pattern record authoring** — `lib/patterns.ts` needs `number` + `price` per record across ~165 entries. Source the numbering from existing image filenames; price comes from… (TBD — Allen, current catalog?). Decide before Chunk D starts.
+  - **Pattern record authoring** — `lib/patterns.ts` needs `number` + `price` per record across ~165 entries. Both come from extracted content: `content/supplies/patterns/<category>/content.md` lists pattern numbers and prices in alternating `#<number>` / `$<price>` blocks (e.g., `#102C` → `$6.00`, `#121` → `$10.00`). Records authored from this source during Chunk D. See [ADR-0017 Amendment 2026-05-22](./decisions/0017-content-modeling-patterns-catalog.md#amendment-2026-05-22--price-field-preserved-from-existing-site-not-new).
 
 ---
 

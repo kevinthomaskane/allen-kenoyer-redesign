@@ -80,35 +80,35 @@ Additional Notes \*
 
 Submit
 
-[](https://allenkenoyerglass.com/wp-content/uploads/2021/10/redflowers-th.jpg)
+![](images/redflowers-th.jpg)
 
 Bring a flower garden indoors, for all season beauty.
 
-[](https://allenkenoyerglass.com/wp-content/uploads/2021/10/akbevels2-th-1.jpg)
+![](images/akbevels2-th-1.jpg)
 
 Beveled cabinet doors, and bathroom windows, for elegant privacy.
 
-[](https://allenkenoyerglass.com/wp-content/uploads/2021/10/akdoors-th.jpg)
+![](images/akdoors-th.jpg)
 
 Entry and interior doors that make a tasteful statement.
 
-[](https://allenkenoyerglass.com/wp-content/uploads/2021/10/aklilies-th-1.jpg)
+![](images/aklilies-th-1.jpg)
 
 Special occasions, hanging panels, gifts and much more.
 
-[](https://allenkenoyerglass.com/wp-content/uploads/2021/10/aksailboat-th.jpg)
+![](images/aksailboat-th.jpg)
 
 Any theme or decor can be enhanced by adding art glass.
 
-[](https://allenkenoyerglass.com/wp-content/uploads/2021/10/akstarburst-th.jpg)
+![](images/akstarburst-th.jpg)
 
 From traditional to contemporary. Let our versatile designer create something special for your home.
 
-[](https://allenkenoyerglass.com/wp-content/uploads/2021/10/akturtle.jpg)
+![](images/akturtle.jpg)
 
 Surprise a loved one or indulge yourself.
 
-[](https://allenkenoyerglass.com/wp-content/uploads/2021/10/aktiger6.gif)
+![](images/aktiger6.gif)
 
 Whimsy and fantasy for beauty and fun.
 

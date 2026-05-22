@@ -48,77 +48,77 @@ Please enjoy your visit and remember, these designs are copyrighted by Allen •
 
 ## More Custom Photos
 
-[](https://allenkenoyerglass.com/wp-content/uploads/2021/10/db_1000_OAKS_WINDOW-2a1.jpg)
+![](images/more-custom-photos--db_1000_OAKS_WINDOW-2a1.jpg)
 
 Window
 
-[](https://allenkenoyerglass.com/wp-content/uploads/2021/10/db_BEV_GLASS_WINDOW-2a1.jpg)
+![](images/more-custom-photos--db_BEV_GLASS_WINDOW-2a1.jpg)
 
 Bevel Glass Window
 
-[](https://allenkenoyerglass.com/wp-content/uploads/2021/10/db_CROCKETT3a1.jpg)
+![](images/more-custom-photos--db_CROCKETT3a1.jpg)
 
 Doors
 
-[](https://allenkenoyerglass.com/wp-content/uploads/2021/10/db_HERMOSA-BEVELa4a1.jpg)
+![](images/more-custom-photos--db_HERMOSA-BEVELa4a1.jpg)
 
 Hermosa Bevel Transform
 
-[](https://allenkenoyerglass.com/wp-content/uploads/2021/10/db_HERMOSA-BEVEL2a1.jpg)
+![](images/more-custom-photos--db_HERMOSA-BEVEL2a1.jpg)
 
 Hermosa Bevel 2
 
-[](https://allenkenoyerglass.com/wp-content/uploads/2021/10/db_IRRID_FLOWERaa1.jpg)
+![](images/more-custom-photos--db_IRRID_FLOWERaa1.jpg)
 
 Irridescent Flower
 
-[](https://allenkenoyerglass.com/wp-content/uploads/2021/10/db_Kaaa1.jpg)
+![](images/more-custom-photos--db_Kaaa1.jpg)
 
 Large Bathroom Windows
 
-[](https://allenkenoyerglass.com/wp-content/uploads/2021/10/db_LARGE-CABa1.jpg)
+![](images/more-custom-photos--db_LARGE-CABa1.jpg)
 
 Large Cabinet Doors
 
-[](https://allenkenoyerglass.com/wp-content/uploads/2021/10/db_LARGE-_FRONT_DOORc1.jpg)
+![](images/more-custom-photos--db_LARGE-_FRONT_DOORc1.jpg)
 
 Large Front Door
 
-[](https://allenkenoyerglass.com/wp-content/uploads/2021/10/db_KITCHEN_STUDIO2a1.jpg)
+![](images/more-custom-photos--db_KITCHEN_STUDIO2a1.jpg)
 
 Kitchen Studio 1
 
-[](https://allenkenoyerglass.com/wp-content/uploads/2021/10/db_KITCHEN_STUDIO3a1.jpg)
+![](images/more-custom-photos--db_KITCHEN_STUDIO3a1.jpg)
 
 Kitchen Studio 2
 
-[](https://allenkenoyerglass.com/wp-content/uploads/2021/10/db_KITCHEN_STUDIO4a1.jpg)
+![](images/more-custom-photos--db_KITCHEN_STUDIO4a1.jpg)
 
 Kitchen Studio 3
 
-[](https://allenkenoyerglass.com/wp-content/uploads/2021/10/db_LARGE-DINING_RM_WINDOWSa1.jpg)
+![](images/more-custom-photos--db_LARGE-DINING_RM_WINDOWSa1.jpg)
 
 Large Dining Room Windows
 
-[](https://allenkenoyerglass.com/wp-content/uploads/2021/10/db_L-HOUSE_-_BOATa1.jpg)
+![](images/more-custom-photos--db_L-HOUSE_-_BOATa1.jpg)
 
 Lighthouse & Boat
 
-[](https://allenkenoyerglass.com/wp-content/uploads/2022/01/IMG_0875.jpg)
+![](images/more-custom-photos--IMG_0875.jpg)
 
-[](https://allenkenoyerglass.com/wp-content/uploads/2022/01/P1010327.jpg)
+![](images/more-custom-photos--P1010327.jpg)
 
-[](https://allenkenoyerglass.com/wp-content/uploads/2022/01/FLWgreen-scaled.jpg)
+![](images/more-custom-photos--FLWgreen-scaled.jpg)
 
-[](https://allenkenoyerglass.com/wp-content/uploads/2022/01/Fred.jpg)
+![](images/more-custom-photos--Fred.jpg)
 
-[](https://allenkenoyerglass.com/wp-content/uploads/2022/01/HumMag2020.jpg)
+![](images/more-custom-photos--HumMag2020.jpg)
 
-[](https://allenkenoyerglass.com/wp-content/uploads/2021/10/aklilies-th-1.jpg)
+![](images/more-custom-photos--aklilies-th-1.jpg)
 
-[](https://allenkenoyerglass.com/wp-content/uploads/2022/01/img-6463.jpg)
+![](images/more-custom-photos--img-6463.jpg)
 
-[](https://allenkenoyerglass.com/wp-content/uploads/2022/01/Tot2020.jpg)
+![](images/more-custom-photos--Tot2020.jpg)
 
 ## Images
 - `more-custom-photos--db_1000_OAKS_WINDOW-2a1.jpg`
