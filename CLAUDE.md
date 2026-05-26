@@ -49,7 +49,7 @@ pnpm migrate:images    # Re-run image migration to Supabase Storage (idempotent)
 
 **Run a single Vitest test:** `pnpm vitest run path/to/file.test.ts -t "test name pattern"`.
 
-**Hard rule: run `pnpm check` locally before every `git push`.** It mirrors CI exactly. See `~/.claude/projects/.../memory/feedback_pnpm_check_before_push.md` for context.
+**Hard rule: run `pnpm check` locally before every `git push`.** It mirrors CI exactly — passing locally avoids the failure-then-hotfix loop.
 
 **Local E2E** needs Playwright browsers installed: `pnpm exec playwright install` (one-time).
 
@@ -107,13 +107,9 @@ scripts/      # Migration scripts (extract-content, migrate-images). Own package
 content/      # Extracted legacy WordPress content (markdown + images). Input to migration; not served at runtime.
 ```
 
-## Project conventions (the non-obvious ones)
+## Project conventions
 
-### Design tokens & styling
-
-**No hex literals in JSX/CSS/inline styles.** All colors flow through Tailwind tokens defined in `src/app/globals.css`. Use Tailwind utilities (`bg-primary`, `text-muted-foreground`, `border-accent-gold`, etc.). If a color is needed that isn't tokenized yet, add the token to `globals.css` first, then use the utility. This is non-negotiable — see `~/.claude/projects/.../memory/feedback_no_hex_literals.md`.
-
-Brand tokens are defined directly from `demo/css/styles.css` and bridged into Tailwind v4 utilities via `@theme inline`. shadcn semantic tokens (`--background`, `--foreground`, `--primary`, etc.) reference brand tokens via `var()` so brand is the single source of truth. shadcn's stock baseline themes (neutral/slate/etc.) are intentionally not used.
+**All code conventions live in [`docs/dev-guide.md`](./docs/dev-guide.md).** Read it before introducing any new library API, naming pattern, styling approach, or convention in `src/`. Every rule in the dev-guide is followed — non-negotiable, no exceptions. When you make a call that isn't yet covered (first use of a new pattern), add a section to the dev-guide in the same PR.
 
 ### Patterns image storage
 
@@ -121,7 +117,7 @@ For _new_ pattern images: they go in **Supabase Storage** (`site-images/patterns
 
 ### When to write an ADR vs. a dev-guide entry
 
-If reversing the decision would require touching many files and rewriting other decisions → ADR. Otherwise it's dev-guide-level (icon library, font choices, date utility, ID generation, build-time script details). See [docs/decisions/README.md#what-is-not-an-adr](./docs/decisions/README.md#what-is-not-an-adr).
+If reversing the decision would require touching many files and rewriting other decisions → ADR. Otherwise it's dev-guide-level (icon library, font choices, date utility, ID generation, build-time script details) and goes in [`docs/dev-guide.md`](./docs/dev-guide.md) as a new H2 section. See [docs/decisions/README.md#what-is-not-an-adr](./docs/decisions/README.md#what-is-not-an-adr) for the delineation. Authoring rule: write the section the first time a convention lands in code, in the same PR.
 
 ### ADR workflow
 
