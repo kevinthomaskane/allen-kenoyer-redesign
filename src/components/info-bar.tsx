@@ -12,7 +12,7 @@ export function InfoBar() {
   return (
     <div className="bg-plum-dark text-cream border-b border-black/10 py-2 text-sm">
       <Container>
-        <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-1 sm:justify-between">
+        <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-1 sm:justify-between md:justify-center">
           <a
             href={siteContact.address.mapHref}
             target="_blank"
@@ -26,7 +26,7 @@ export function InfoBar() {
           </a>
           <a
             href={siteContact.phoneHref}
-            className="hover:text-accent-gold-light flex items-center gap-2 font-medium transition-colors"
+            className="hover:text-accent-gold-light flex items-center gap-2 font-medium transition-colors md:hidden"
           >
             <Phone className="size-4 shrink-0" aria-hidden />
             <span>{siteContact.phone}</span>

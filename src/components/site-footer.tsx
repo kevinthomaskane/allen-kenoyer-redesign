@@ -20,9 +20,9 @@ export function SiteFooter() {
             <Image
               src="/logo-allen-kenoyer-glass.png"
               alt="Allen Kenoyer Glass"
-              width={220}
-              height={50}
-              className="brightness-0 invert"
+              width={549}
+              height={207}
+              className="w-[220px] brightness-0 invert"
             />
             <p className="text-cream/80 mt-4 max-w-sm text-base">
               Crafting beauty and light since 1978.

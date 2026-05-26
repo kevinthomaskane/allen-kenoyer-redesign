@@ -38,8 +38,8 @@ export function SiteNav() {
             <Image
               src="/logo-allen-kenoyer-glass.png"
               alt=""
-              width={220}
-              height={50}
+              width={549}
+              height={207}
               className="h-10 w-auto md:h-12"
               priority
             />
