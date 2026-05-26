@@ -1,11 +1,12 @@
-// One-shot script: upload every image under content/<slug>/images/ to the
-// Supabase Storage `site-images` bucket. Idempotent — safe to re-run.
-// Pattern images are handled by a parallel script: see migrate-pattern-images.mjs
-// (per ADR-0017 Amendment 2026-05-22, patterns now live under
-// site-images/patterns/<category>/ alongside the rest of the site's images).
+// One-shot script: upload every pattern image under
+// content/supplies/patterns/<category>/images/ to the Supabase Storage
+// `site-images` bucket at patterns/<category>/<file>. Idempotent — safe to re-run.
+//
+// See ADR-0017 Amendment 2026-05-22 (pattern image storage moves to Supabase
+// Storage) — reverses the original /public/ decision.
 //
 // Run from the repo root with the env file containing the secret key:
-//   pnpm migrate:images
+//   pnpm migrate:patterns
 //
 // Required env (in .env.local at repo root):
 //   NEXT_PUBLIC_SUPABASE_URL
@@ -21,24 +22,13 @@ const BUCKET = "site-images";
 
 if (!SUPABASE_URL || !SUPABASE_SECRET_KEY) {
   console.error(
-    "Missing NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SECRET_KEY. Make sure .env.local is configured and you ran via `pnpm migrate:images` (which passes --env-file)."
+    "Missing NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SECRET_KEY. Make sure .env.local is configured and you ran via `pnpm migrate:patterns` (which passes --env-file)."
   );
   process.exit(1);
 }
 
-// Slugs to migrate. Patterns are handled by scripts/migrate-pattern-images.mjs
-// because their content/supplies/patterns/<category>/images/ shape differs from
-// the slug-flat shape this script walks.
-const SLUGS = [
-  "cabinet-doors",
-  "classes",
-  "contact",
-  "custom-design",
-  "home",
-  "portfolio",
-  "repairs",
-  "supplies",
-];
+// Pattern categories per ADR-0017's catalog structure.
+const CATEGORIES = ["beginner", "intermediate", "advanced", "mirrors-and-frames"];
 
 const CONTENT_TYPE_BY_EXT = {
   ".jpg": "image/jpeg",
@@ -88,33 +78,33 @@ async function uploadOne(localPath, bucketPath) {
 
 async function main() {
   const repoRoot = process.cwd();
-  const contentRoot = join(repoRoot, "content");
+  const patternsRoot = join(repoRoot, "content", "supplies", "patterns");
 
   let total = 0;
   let success = 0;
   const failures = [];
 
-  for (const slug of SLUGS) {
-    const slugDir = join(contentRoot, slug, "images");
+  for (const category of CATEGORIES) {
+    const categoryDir = join(patternsRoot, category, "images");
     let exists = false;
     try {
-      const s = await stat(slugDir);
+      const s = await stat(categoryDir);
       exists = s.isDirectory();
     } catch {
       // missing dir — skip
     }
     if (!exists) {
-      console.log(`[${slug}] no images/ directory, skipping`);
+      console.log(`[${category}] no images/ directory, skipping`);
       continue;
     }
 
-    const files = await walkImages(slugDir);
-    console.log(`[${slug}] ${files.length} image(s)`);
+    const files = await walkImages(categoryDir);
+    console.log(`[${category}] ${files.length} image(s)`);
 
     for (const file of files) {
       total++;
-      const rel = relative(slugDir, file);
-      const bucketPath = `${slug}/${rel}`.split("\\").join("/"); // safe on win
+      const rel = relative(categoryDir, file);
+      const bucketPath = `patterns/${category}/${rel}`.split("\\").join("/");
       const err = await uploadOne(file, bucketPath);
       if (err) {
         failures.push({ bucketPath, message: err.message });

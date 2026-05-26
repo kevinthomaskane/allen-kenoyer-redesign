@@ -20,14 +20,17 @@
     "test:e2e": "playwright test",
     "check": "pnpm lint && pnpm format:check && pnpm typecheck && pnpm test",
     "check:e2e": "pnpm check && pnpm test:e2e",
-    "migrate:images": "node --env-file=.env.local scripts/migrate-images.mjs"
+    "migrate:images": "node --env-file=.env.local scripts/migrate-images.mjs",
+    "migrate:patterns": "node --env-file=.env.local scripts/migrate-pattern-images.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.106.1",
     "class-variance-authority": "0.7.1",
     "clsx": "2.1.1",
     "lucide-react": "1.16.0",
+    "motion": "^12.40.0",
     "next": "16.2.6",
+    "radix-ui": "^1.4.3",
     "react": "19.2.6",
     "react-dom": "19.2.6",
     "tailwind-merge": "3.6.0"
