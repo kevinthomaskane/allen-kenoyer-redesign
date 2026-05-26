@@ -130,6 +130,26 @@ If a page needs a wider or narrower max-width than the default, pass a `classNam
 
 ---
 
+## Patterns catalog
+
+**Location:** [`src/lib/patterns.ts`](../src/lib/patterns.ts).
+
+**Rule:** The patterns catalog is dev-managed per [ADR-0017](./decisions/0017-content-modeling-patterns-catalog.md). All records live as a single typed array; adding or editing patterns is a code change. There is no admin UI and no database backing.
+
+**Source order is preserved.** Records are kept in the order they appear in `content/supplies/patterns/<category>/content.md`. Don't sort the source array — consumers call `getPatternsByCategory(category)` which sorts at consumption time using `Intl.Collator` with `numeric: true` so `#9 < #10 < #102 < #102C` orders correctly.
+
+**Uniqueness is `(category, number)`, not bare `number`.** Per [ADR-0017 Amendment 2026-05-26](./decisions/0017-content-modeling-patterns-catalog.md), five numbers (`#105`, `#109`, `#111`, `#789`, `#805`) appear in more than one category as distinct designs with their own prices. Catalog-construction invariants are asserted by `src/lib/patterns.test.ts`; any consumer that needs to identify a pattern must key off the pair.
+
+**Image URLs go through `patternImageUrl(pattern)`.** Don't hand-compose Supabase Storage URLs inline. The helper centralizes the `${NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/site-images/patterns/<category>/<image>` shape so a future bucket reorganization is one edit.
+
+**Alt text uses `patternAlt(pattern)`.** Default is `"{Category label} pattern #{number}"`; an optional `alt` field on the record overrides it. Don't write per-pattern alt text unless the default actually misleads — there's no descriptive name field, so the number-based fallback is correct.
+
+**Image-filename convention:** preserved from the source CMS — `<category>-<number>.<ext>` (extensions: `.gif` or `.jpg`). Note the source occasionally appended `02` to disambiguate (`intermediate-78902.gif` is `#789`). Keep the on-disk filename as the `image` field literal; the displayed `number` is the bare one.
+
+ADR anchor: [ADR-0017](./decisions/0017-content-modeling-patterns-catalog.md).
+
+---
+
 ## Type discipline *(stub — Phase 2 will fill in specifics)*
 
 **Anchored rule (from [ADR-0005](./decisions/0005-database-and-query-layer.md)):** When Phase 2 lands the Supabase schema, types for table rows come from `supabase gen types typescript` (committed at `src/types/database.ts` or equivalent — exact path TBD). Application code consumes those generated types; don't redeclare row shapes by hand. Form types derive from Zod schemas via `z.infer<>` ([ADR-0009](./decisions/0009-forms-and-validation.md)).

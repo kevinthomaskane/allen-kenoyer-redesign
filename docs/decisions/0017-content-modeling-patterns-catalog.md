@@ -89,7 +89,7 @@ type Pattern = {
 };
 ```
 
-`number` is a string, not an integer — the existing catalog uses alphanumeric numbers (`102C`, `103C`, etc.) that don't fit an integer type. Uniqueness is enforced at the catalog level, not just per-category, but the public site exposes patterns within their category page.
+`number` is a string, not an integer — the existing catalog uses alphanumeric numbers (`102C`, `103C`, etc.) that don't fit an integer type. Uniqueness is enforced at the catalog level, not just per-category, but the public site exposes patterns within their category page. *See "Amendment 2026-05-26 — Uniqueness is (category, number), not catalog-wide" below — the catalog-wide uniqueness claim is reversed; uniqueness is per-category.*
 
 ### Image storage
 
@@ -176,3 +176,21 @@ The original ADR placed pattern images at `/public/patterns/[category]/` and exp
 - Mixed `.gif` / `.jpg` extensions preserved through migration; `next/image` re-encodes for delivery regardless.
 
 **Implementation note for [Phase 1 Chunk D](../implementation-plan.md#phase-1--public-marketing-site):** pattern images migrate into Supabase Storage during Chunk D, mirroring Chunk A's content-image migration approach. The plan is updated accordingly.
+
+## Amendment 2026-05-26 — Uniqueness is (category, number), not catalog-wide
+
+The original ADR stated that pattern `number` is unique catalog-wide. Inspection of the extracted source data during [Phase 1 Chunk D](../implementation-plan.md#phase-1--public-marketing-site) authoring shows otherwise: five numbers appear in two categories each — `#105`, `#109`, `#111` in both Beginner and Mirrors & Frames, plus `#789` and `#805` in both Beginner and Intermediate. They are distinct designs, and several carry different prices across categories (e.g., `#105` is $6.00 Beginner / $8.00 Mirrors & Frames). The live site has shipped this way for years; the rebuild matches that reality rather than re-numbering.
+
+**What changes:**
+
+- **Uniqueness model:** the composite key `(category, number)` is unique within the catalog. A bare `number` is unique within its category but not across categories.
+- **Type:** `Pattern.number: string` is preserved; the type doesn't carry the category as a discriminant beyond the existing `category` field. Catalog-construction assertions in `lib/patterns.ts` check `(category, number)` uniqueness, not bare-`number` uniqueness.
+- **Public UX:** unchanged. Each category page already exists at its own route (`/supplies/patterns/[category]`) and lists only its own patterns, so a customer sees `#105` exactly once within any given browsing context. The lightbox shows number + price + image; the URL exposes the category, and the displayed number is short and ordering-friendly.
+
+**What does not change:**
+
+- The `Pattern` type shape — `number`, `category`, `price`, `image`, optional `alt` — and the dev-managed single-module `lib/patterns.ts` storage decision.
+- Sort order (natural-numeric `number` ascending), grid + lightbox UX, "no per-pattern URL", copyright posture.
+- Customer ordering vocabulary — patterns are still referenced by the bare number when ordering by phone or email. The studio's existing flow already disambiguates by category in conversation when needed.
+
+**Implementation note:** [Phase 1 Chunk D](../implementation-plan.md#phase-1--public-marketing-site) authoring uses the source content.md files (`content/supplies/patterns/<category>/content.md`) directly. Pattern numbers/prices are aligned positionally with the `## Images` filename list in the same file (which preserves the source's `<category>-<number>.<ext>` filename convention, including the `02` suffix the source CMS appended to filenames whose numeric stem already existed elsewhere — e.g., `intermediate-78902.gif` is `#789` in the Intermediate category, distinct from `beginner-789.gif`).
