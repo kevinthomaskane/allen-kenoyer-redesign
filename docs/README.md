@@ -6,6 +6,7 @@ Project documentation. Read this index before reaching for any file — it disam
 
 - **[`implementation-plan.md`](./implementation-plan.md)** — Plan of record for what's being built and in what order. Phase 0–4 with chunks, scope, exit criteria, and resolution blocks for completed work. Update as phases progress.
 - **[`website-outline.md`](./website-outline.md)** — Pages and navigation as locked with Kristin (the client). Source of truth for the public-site page inventory and the header nav structure. If something here disagrees with an internal draft or earlier doc, this wins.
+- **[`parallel-claude-sessions.md`](./parallel-claude-sessions.md)** — Workflow for running two Claude Code sessions on this repo simultaneously. Worktree setup, branch conventions, the failure mode that motivated structural isolation. Read only when parallel work is happening.
 
 ## Subdirectories
 

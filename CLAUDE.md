@@ -14,6 +14,7 @@ The `docs/` layout is index-driven — start at [`docs/README.md`](./docs/README
 
 - **[`docs/implementation-plan.md`](./docs/implementation-plan.md)** — plan of record for what's being built and in what order. Phase 0 → 4 with chunks, scope, exit criteria, and resolution blocks. Check the Status table at the bottom for current phase progress.
 - **[`docs/website-outline.md`](./docs/website-outline.md)** — pages and navigation as locked with Kristin. **This is the source of truth for the public-site page inventory and header nav.** If something in an internal draft or earlier doc disagrees with this, this wins.
+- **[`docs/parallel-claude-sessions.md`](./docs/parallel-claude-sessions.md)** — required reading **only when another Claude session is active on this repo at the same time** (Kevin will say so explicitly). Worktree setup, branch convention, and the failure mode that made the structural separation necessary. Skip if working solo on `main`.
 - **[`docs/decisions/`](./docs/decisions/)** — 21 ADRs (0001–0021), all Accepted. Read the ADR (not just its title) before touching the surface it governs.
 - **[`docs/for-kristin/`](./docs/for-kristin/)** — stakeholder-facing plain-language design docs (calendar integration → ADR-0020, dashboard workflow → ADR-0021). Useful for understanding what was promised to the client; the ADRs are how it actually gets built.
 - **[`docs/notes/`](./docs/notes/)** — internal working notes and research. **Not canonical.** Context for how decisions were reached; the relevant ADR is the actual commitment.
