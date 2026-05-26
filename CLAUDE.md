@@ -10,7 +10,7 @@ WordPress-to-custom rebuild for Allen Kenoyer Glass (Lawndale, CA stained glass 
 
 Project decisions are **ADR-first**. Implementation follows a phased plan that cites the ADRs it realizes. Do not propose architecture changes without checking what's already decided.
 
-- **[`docs/decisions/`](./docs/decisions/)** — 21 ADRs (0001–0021) with a [README index](./docs/decisions/README.md). Most are Accepted; ADR-0021 is currently In Discussion. Read the ADR (not just its title) before touching the surface it governs.
+- **[`docs/decisions/`](./docs/decisions/)** — 21 ADRs (0001–0021) with a [README index](./docs/decisions/README.md). All Accepted. Read the ADR (not just its title) before touching the surface it governs.
 - **[`docs/implementation-plan.md`](./docs/implementation-plan.md)** — phased roadmap (Phase 0 → 4) and the plan-of-record for _how_ and _in what order_ the build happens. Each phase lists ADRs realized, scope in/out, exit criteria, and open questions. Check the Status table at the bottom for current phase progress.
 - **[`docs/class-calendar-integration-for-kristin.md`](./docs/class-calendar-integration-for-kristin.md)** and **[`docs/class-dashboard-for-kristin.md`](./docs/class-dashboard-for-kristin.md)** — plain-language design docs written for the client. When workflow questions come up, these reflect what was promised; the technical ADRs (0020, 0021) reflect how it gets built.
 - **[`docs/current-pages-for-kristin.txt`](./docs/current-pages-for-kristin.txt)** — client-facing inventory of the existing site's pages and the proposed admin field list. Source-of-truth for "what does Kristin expect to see/manage."

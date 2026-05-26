@@ -136,6 +136,22 @@ Per [ADR-0020](./0020-google-calendar-integration.md), integrating class data wi
 
 **Rationale note on `enrollment_count`.** This ADR's original framing — *"admin-only planning aid. Never displayed publicly"* — remains true for the value itself. The sold-out title prefix introduced by [ADR-0020](./0020-google-calendar-integration.md) does, however, make `enrollment_count`'s *consequences* public: when `enrollment_count >= max_students`, every Google Calendar event for the affected cohort is prefixed `[SOLD OUT]`. The count number is still never displayed; the derived sold-out state is.
 
+## Amendment 2026-05-26 — Cohort kind column
+
+Per [ADR-0021](./0021-admin-class-workflow-ux.md), the admin UI surfaces two distinct cohort creation flows ("New cohort" for multi-session courses, "New single session" for one-off workshops), and the public site renders the two kinds with different card layouts. A reliable column-level signal is needed so the renderer doesn't have to derive intent from session count.
+
+**`cohorts`** — one new column:
+
+| Field | Type | Notes |
+|---|---|---|
+| `kind` | enum (`'multi_session' \| 'single_session'`) | Set on insert based on the admin's entry-point choice; immutable thereafter. The public site renderer branches on this column. |
+
+**Field semantics revised by this amendment:**
+
+- `label` semantics narrow: required for `kind = 'multi_session'`, optional/auto-generated for `kind = 'single_session'` (single-session workshops do not need a human-meaningful cohort label; the date and time serve as identification). [ADR-0020](./0020-google-calendar-integration.md)'s 2026-05-22 amendment already dropped the database-level `NOT NULL` constraint on `label`; this amendment adds the `kind`-conditional rule that the admin and renderer enforce on top of that constraint relaxation.
+
+**Tradeoff:** Converting a single-session workshop into a multi-session cohort (or vice versa) requires deleting and recreating the cohort, since `kind` is immutable. Acceptable; conversion would be rare and the data model treats them as distinct kinds.
+
 ## Related decisions
 
 - Depends on: [ADR-0004](./0004-admin-dashboard-architecture.md) (defines class as one of the two admin-managed content types), [ADR-0005](./0005-database-and-query-layer.md) (Postgres + Supabase CLI migrations will implement this schema), [ADR-0007](./0007-image-pipeline-and-storage.md) (Supabase Storage backs the optional class image).
