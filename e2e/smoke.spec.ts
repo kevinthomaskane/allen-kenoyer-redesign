@@ -1,8 +1,8 @@
 import { expect, test } from "@playwright/test";
 
-// Chunk C exit criteria: every top-level public route renders and is reachable
-// from header/footer nav. This smoke walks each route, asserts a 200 response,
-// a visible H1, and (where applicable) the migrated Supabase image host.
+// Phase 1 exit criteria: every public route renders, returns 200, and has a
+// visible H1. Covers the 9 Chunk C content routes plus the 5 Chunk D pattern
+// routes for 14 total.
 
 const ROUTES: { path: string; heading: RegExp | string }[] = [
   { path: "/", heading: /Allen Kenoyer/i },
@@ -14,6 +14,17 @@ const ROUTES: { path: string; heading: RegExp | string }[] = [
   { path: "/portfolio/", heading: /Portfolio/i },
   { path: "/repairs/", heading: /Repair/i },
   { path: "/supplies/", heading: /Art Glass Supplies/i },
+  { path: "/supplies/patterns/", heading: /Stained Glass Patterns/i },
+  { path: "/supplies/patterns/beginner/", heading: /Beginner Patterns/i },
+  {
+    path: "/supplies/patterns/intermediate/",
+    heading: /Intermediate Patterns/i,
+  },
+  { path: "/supplies/patterns/advanced/", heading: /Advanced Patterns/i },
+  {
+    path: "/supplies/patterns/mirrors-and-frames/",
+    heading: /Mirrors & Frames Patterns/i,
+  },
 ];
 
 for (const route of ROUTES) {

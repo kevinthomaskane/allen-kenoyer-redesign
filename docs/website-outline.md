@@ -38,7 +38,7 @@
 - All classes have a default limit of 7 students unless otherwise noted
 - Add "Mosaic Table Top – Glass on Wood – Beginner (no prerequisite)" to Mosaic section
 - Parties section: done if booked well in advance; limit 8–12 people depending on project chosen
-- Custom calendar replaces Google Calendar embed — no more dual tracking
+- Class calendar remains on Kristin's existing public Google Calendar. The admin dashboard syncs class updates to that calendar in the background so Kristin doesn't dual-track. See [ADR-0020](./decisions/0020-google-calendar-integration.md).
 
 ---
 
@@ -48,7 +48,7 @@
 
 **Client notes:**
 - Keeps the existing URL — no redirect needed
-- Replaces the Google Calendar embed with a custom-built calendar driven by the Admin Dashboard
+- Continues to embed Kristin's existing public Google Calendar. The admin dashboard pushes class updates to that calendar in the background, so changes made in the dashboard appear on the embedded calendar automatically. See [ADR-0020](./decisions/0020-google-calendar-integration.md).
 - Bookmarkable and directly linkable from the homepage CTA and nav
 
 ---
