@@ -125,7 +125,7 @@ This document is the plan-of-record for *how* and *in what order* the build happ
   1. One route per slug in `src/app/`. Each route's content is manually converted from `content/<slug>/content.md` into JSX during this chunk. Extraction artifacts (stray `9` tokens, etc.) are cleaned up at conversion time.
   2. Image references resolved to Supabase Storage URLs via `next/image` with explicit `width`/`height` props (no auto-detection since these are remote).
   3. Each route inherits the layout chrome from Chunk B and is mobile-responsive at the route level.
-  4. `/classes/calendar` ships as a static placeholder reflecting the current `content.md` snapshot — the dynamic CMS wiring lands in Phase 2.
+  4. `/classes/calendar` embeds Kristin's existing public Google Calendar per [ADR-0020](./decisions/0020-google-calendar-integration.md). This is the permanent surface, not a Phase 1 placeholder — the calendar Kristin and her students actually look at remains her Google Calendar. The admin → GCal sync that keeps the calendar current ships in Phase 2 alongside the admin dashboard and does not change the public-side embed.
   5. Cosmetic favicon.ico added (resolves the existing 404).
 
   **Chunk D — Patterns catalog routes (5 routes)**
