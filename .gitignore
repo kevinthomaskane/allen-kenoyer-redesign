@@ -1,7 +1,6 @@
 .DS_Store
 docs/**/*.docx
 docs/**/*.txt
-docs/website-outline.md
 
 # dependencies
 node_modules/
