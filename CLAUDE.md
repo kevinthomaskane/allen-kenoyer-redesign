@@ -10,10 +10,14 @@ WordPress-to-custom rebuild for Allen Kenoyer Glass (Lawndale, CA stained glass 
 
 Project decisions are **ADR-first**. Implementation follows a phased plan that cites the ADRs it realizes. Do not propose architecture changes without checking what's already decided.
 
-- **[`docs/decisions/`](./docs/decisions/)** — 21 ADRs (0001–0021) with a [README index](./docs/decisions/README.md). All Accepted. Read the ADR (not just its title) before touching the surface it governs.
-- **[`docs/implementation-plan.md`](./docs/implementation-plan.md)** — phased roadmap (Phase 0 → 4) and the plan-of-record for _how_ and _in what order_ the build happens. Each phase lists ADRs realized, scope in/out, exit criteria, and open questions. Check the Status table at the bottom for current phase progress.
-- **[`docs/class-calendar-integration-for-kristin.md`](./docs/class-calendar-integration-for-kristin.md)** and **[`docs/class-dashboard-for-kristin.md`](./docs/class-dashboard-for-kristin.md)** — plain-language design docs written for the client. When workflow questions come up, these reflect what was promised; the technical ADRs (0020, 0021) reflect how it gets built.
-- **[`docs/current-pages-for-kristin.txt`](./docs/current-pages-for-kristin.txt)** — client-facing inventory of the existing site's pages and the proposed admin field list. Source-of-truth for "what does Kristin expect to see/manage."
+The `docs/` layout is index-driven — start at [`docs/README.md`](./docs/README.md), which disambiguates "current authoritative" from "client-facing translation" from "earlier draft / superseded." Key entry points:
+
+- **[`docs/implementation-plan.md`](./docs/implementation-plan.md)** — plan of record for what's being built and in what order. Phase 0 → 4 with chunks, scope, exit criteria, and resolution blocks. Check the Status table at the bottom for current phase progress.
+- **[`docs/website-outline.md`](./docs/website-outline.md)** — pages and navigation as locked with Kristin. **This is the source of truth for the public-site page inventory and header nav.** If something in an internal draft or earlier doc disagrees with this, this wins.
+- **[`docs/decisions/`](./docs/decisions/)** — 21 ADRs (0001–0021), all Accepted. Read the ADR (not just its title) before touching the surface it governs.
+- **[`docs/for-kristin/`](./docs/for-kristin/)** — stakeholder-facing plain-language design docs (calendar integration → ADR-0020, dashboard workflow → ADR-0021). Useful for understanding what was promised to the client; the ADRs are how it actually gets built.
+- **[`docs/notes/`](./docs/notes/)** — internal working notes and research. **Not canonical.** Context for how decisions were reached; the relevant ADR is the actual commitment.
+- **`docs/archive/`** — local-only historical artifacts (superseded outlines, early client drafts). Don't cite these as canon. The `current-pages-for-kristin.txt` artifact lives here — it was the _first_ client-facing pages draft and has been superseded by `website-outline.md`.
 
 When an ADR amendment lands, it appears as an `### Amendment YYYY-MM-DD — <title>` subsection in the ADR file itself. Affected sections in the original decision text get italic forward pointers (`*See "Amendment YYYY-MM-DD" below — ...*`). Always read the bottom of an ADR before quoting its decisions.
 

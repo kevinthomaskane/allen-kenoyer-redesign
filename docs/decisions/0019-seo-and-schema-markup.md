@@ -6,7 +6,7 @@
 
 ## Context
 
-The rebuild preserves the existing site's SEO equity (handled by [ADR-0018](./0018-url-redirects-and-migration.md)) and is an opportunity to materially strengthen it. The studio is a 47-year-old local business in the Greater Los Angeles area with a strong Google review profile and clear entity signals (NAP, hours, social presence, founder/staff). `docs/seo-research.md` enumerates the available signals and proposes a broad menu of structured-data and on-page optimizations.
+The rebuild preserves the existing site's SEO equity (handled by [ADR-0018](./0018-url-redirects-and-migration.md)) and is an opportunity to materially strengthen it. The studio is a 47-year-old local business in the Greater Los Angeles area with a strong Google review profile and clear entity signals (NAP, hours, social presence, founder/staff). `docs/notes/seo-research.md` enumerates the available signals and proposes a broad menu of structured-data and on-page optimizations.
 
 This ADR locks the *implementation set* — which schema types we actually emit, where they live in code, how the sitemap is generated, the canonical-URL and robots.txt posture, the OG/Twitter image approach, and how we validate the output. The research document is the input; this ADR is the commitment.
 
@@ -63,7 +63,7 @@ Constraints that apply:
 
 Two schema implementations:
 
-1. **LocalBusiness composite** — site-wide on home, contact, and the classes index page. Composite type `[LocalBusiness, ArtGallery, EducationalOrganization]` with the field set per `docs/seo-research.md §10a`: name/alternateName, description, foundingDate, url, telephone, email, full PostalAddress, GeoCoordinates, openingHoursSpecification, priceRange, sameAs (social profiles), hasMap, aggregateRating.
+1. **LocalBusiness composite** — site-wide on home, contact, and the classes index page. Composite type `[LocalBusiness, ArtGallery, EducationalOrganization]` with the field set per `docs/notes/seo-research.md §10a`: name/alternateName, description, foundingDate, url, telephone, email, full PostalAddress, GeoCoordinates, openingHoursSpecification, priceRange, sameAs (social profiles), hasMap, aggregateRating.
 2. **`Course` per class** — emitted on each class detail page. Drawn from the `classes` row (name, description, skill_level, prerequisite) and the parent organization (the studio's LocalBusiness as `provider`). Class detail pages exist for any visible class (per [ADR-0015](./0015-content-modeling-classes.md)).
 
 **Excluded by decision:**
@@ -135,7 +135,7 @@ A pre-launch and post-launch manual check using Google Rich Results Test is part
 
 ## Rationale
 
-- **Two-schema implementation is the right ROI band for this site.** LocalBusiness composite is the highest-leverage signal a local studio can emit — it directly informs the Knowledge Panel, local-pack ranking, and the Map listing. `Course` per class targets a richer SERP appearance for the class catalog, which is the studio's primary inbound-discovery surface. The other schema types proposed in `docs/seo-research.md` are valuable in principle but each depends on a page that isn't in scope; emitting markup for content that doesn't exist would be cargo-culting.
+- **Two-schema implementation is the right ROI band for this site.** LocalBusiness composite is the highest-leverage signal a local studio can emit — it directly informs the Knowledge Panel, local-pack ranking, and the Map listing. `Course` per class targets a richer SERP appearance for the class catalog, which is the studio's primary inbound-discovery surface. The other schema types proposed in `docs/notes/seo-research.md` are valuable in principle but each depends on a page that isn't in scope; emitting markup for content that doesn't exist would be cargo-culting.
 - **Hand-rolled helpers + `schema-dts`** is the smallest reasonable approach. `schema-dts` is types-only — no runtime cost — and catches typos and structural mistakes at build time. A higher-level SEO library would be larger, more opinionated, and would need to be evaluated for whether it composes cleanly with Next.js App Router metadata. The 2-schema scope doesn't warrant the dependency.
 - **`app/sitemap.ts` is the App Router-native pattern.** It runs in the same Node context as Server Components, so querying Supabase for visible classes is a normal database call. No build-time pre-generation step to maintain, no `next-sitemap` config to keep in sync. Class entries automatically reflect the visibility rule from [ADR-0015](./0015-content-modeling-classes.md) — drafts and expired classes never leak into the sitemap.
 - **Static site-wide OG image is the simplest choice that doesn't actively hurt.** Dynamic per-page OG images are polished but cost build/runtime complexity and another component to maintain. The studio's social-share volume is low; one well-designed OG image (the storefront or a brand card) covers every page acceptably.
@@ -157,4 +157,4 @@ A pre-launch and post-launch manual check using Google Rich Results Test is part
 
 - Depends on: [ADR-0001](./0001-frontend-framework.md) (App Router conventions for `app/sitemap.ts`, `app/robots.ts`, per-route `metadata`), [ADR-0013](./0013-testing-strategy.md) (CI test suite hosts the schema validation), [ADR-0015](./0015-content-modeling-classes.md) (Course schema and sitemap entries derive from the class data shape and the visibility rule), [ADR-0018](./0018-url-redirects-and-migration.md) (canonical URLs reinforce the trailingSlash:true scheme).
 - Influences: dev-guide line items — the OG image asset (1200×630), the `schema-dts` install, the builder function locations (`lib/schema/*.ts` or similar), the per-route metadata pattern, the Vitest schema-validation test file.
-- Document of record: [`docs/seo-research.md`](../seo-research.md) (input research; not normative). This ADR is the implementation commitment.
+- Document of record: [`docs/notes/seo-research.md`](../notes/seo-research.md) (input research; not normative). This ADR is the implementation commitment.

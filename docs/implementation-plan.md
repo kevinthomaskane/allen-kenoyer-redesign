@@ -209,8 +209,8 @@ Items that span phases and need a home regardless of where they land:
 
 - Testing strategy ([ADR 0013](./decisions/0013-testing-strategy.md)) — when do tests get written, and against which phase's surface?
 - Linting & formatting ([ADR 0014](./decisions/0014-linting-and-formatting.md)) — established in Phase 0, enforced thereafter.
-- Content migration — extracting and porting content from the legacy WordPress site (see [`content-extraction-plan.md`](./content-extraction-plan.md)).
-- SEO ([`seo-research.md`](./seo-research.md)) and redirects ([`redirects.md`](./redirects.md)).
+- Content migration — extracting and porting content from the legacy WordPress site (see [`content-extraction-plan.md`](./notes/content-extraction-plan.md)).
+- SEO ([`seo-research.md`](./notes/seo-research.md)) and redirects ([`redirects.md`](./notes/redirects.md)).
 
 ---
 

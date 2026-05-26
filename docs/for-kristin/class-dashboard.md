@@ -12,7 +12,7 @@ The new admin dashboard is the one place you'll manage your classes. You add a c
 
 This document walks through how that flow feels day-to-day: creating a brand-new class, scheduling a multi-week course, scheduling a one-off workshop, editing, and publishing.
 
-For the Google Calendar side specifically, see the [calendar integration doc](./class-calendar-integration-for-kristin.md). The two work together — this one is about the dashboard side.
+For the Google Calendar side specifically, see the [calendar integration doc](./class-calendar-integration.md). The two work together — this one is about the dashboard side.
 
 ---
 
@@ -104,7 +104,7 @@ The dashboard will make it clear, for each class, whether it's currently visible
 
 - **Past cohorts stay in the dashboard.** Once a cohort's sessions have all passed, it doesn't get deleted automatically. You can look back at what you've run, copy an old cohort's structure when re-launching a course, or delete the history yourself if you want it cleaned up.
 - **Class names create the website URL.** If you rename a class later, its web address changes too. Usually that's fine — but if a class is widely shared or linked, mention it to us before renaming.
-- **The Google Calendar integration runs in the background.** You don't trigger it manually. Every save you make in the dashboard pushes the right updates to your calendar automatically. See the [calendar integration doc](./class-calendar-integration-for-kristin.md) for the details.
+- **The Google Calendar integration runs in the background.** You don't trigger it manually. Every save you make in the dashboard pushes the right updates to your calendar automatically. See the [calendar integration doc](./class-calendar-integration.md) for the details.
 
 ---
 

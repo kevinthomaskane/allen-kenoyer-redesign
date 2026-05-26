@@ -9,7 +9,7 @@
 The site has two distinct categories of forms:
 
 - **Public-site forms** — contact form, custom-design inquiry, repair inquiry, newsletter signup. Low-traffic, low-stakes, all destined for delivery to the studio (mechanism decided in [ADR-0010](./0010-form-submission-and-transactional-email.md); note that newsletter signup is carved out of that pipeline per [ADR-0011](./0011-newsletter-esp-integration.md) and bypasses our backend).
-- **Admin forms** — login ([ADR-0006](./0006-authentication.md)), class editor (12+ fields per [current-pages-for-kristin.txt]), bulletin editor, password reset. Higher-stakes, write to the database.
+- **Admin forms** — login ([ADR-0006](./0006-authentication.md)), class editor (12+ fields per [docs/archive/current-pages-for-kristin.txt]), bulletin editor, password reset. Higher-stakes, write to the database.
 
 [ADR-0008](./0008-styling-and-ui-layer.md) locked shadcn/ui as the component primitives layer, and shadcn ships a `<Form>` component that's a thin wrapper around React Hook Form + Zod. That makes the conventional pairing the path of least resistance, but not automatic.
 

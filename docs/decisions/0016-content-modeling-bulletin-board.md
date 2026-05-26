@@ -6,7 +6,7 @@
 
 ## Context
 
-[ADR-0004](./0004-admin-dashboard-architecture.md) committed to a custom-built admin managing exactly two content types: classes (now modeled in [ADR-0015](./0015-content-modeling-classes.md)) and bulletin posts. The field list documented in `docs/current-pages-for-kristin.txt` is short: title, message, display dates (start/end), published/draft. Active bulletins display on the homepage; more than one may be active at a time.
+[ADR-0004](./0004-admin-dashboard-architecture.md) committed to a custom-built admin managing exactly two content types: classes (now modeled in [ADR-0015](./0015-content-modeling-classes.md)) and bulletin posts. The field list documented in `docs/archive/current-pages-for-kristin.txt` is short: title, message, display dates (start/end), published/draft. Active bulletins display on the homepage; more than one may be active at a time.
 
 This ADR locks the *shape* of the bulletin content model — display window semantics, lifecycle of expired bulletins, message format, ordering when multiple are active, and which optional features (image, detail page, type/severity) are in or out.
 

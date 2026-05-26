@@ -10,7 +10,7 @@ Per the locked project scope ([README](./README.md)), the admin dashboard is the
 
 The admin manages exactly two content types:
 
-1. **Classes** — with the field set documented in `current-pages-for-kristin.txt` (name, category, skill level, prerequisite, description, sessions, dates/times, tuition, supply fee, kit fee, max students, published/draft).
+1. **Classes** — with the field set documented in `docs/archive/current-pages-for-kristin.txt` (name, category, skill level, prerequisite, description, sessions, dates/times, tuition, supply fee, kit fee, max students, published/draft).
 2. **Bulletin posts** — title, message, display start/end dates, published/draft. Active bulletins display on the homepage.
 
 No other site content needs to be admin-editable — studio hours, contact info, page copy, portfolio, and the pattern catalog are all developer-managed.

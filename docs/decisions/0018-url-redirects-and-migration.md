@@ -8,7 +8,7 @@
 
 The existing site runs on WordPress at `allenkenoyerglass.com` with roughly 20 publicly-indexed URLs. The rebuild moves to a Next.js app on Vercel ([ADR-0001](./0001-frontend-framework.md), [ADR-0002](./0002-hosting-platform.md)) at the same domain. The migration must preserve SEO equity by routing existing URLs to their closest equivalents on the new site, while cleanly handling pages that are being eliminated and URLs that have no equivalent at all (WP internals, query-string post URLs, image paths).
 
-The specific URL mapping is already locked in [`docs/redirects.md`](../redirects.md). This ADR captures the *mechanism*, *policy*, and *cutover plan* — not the destination table itself, which is treated as living content and may evolve up to launch without invalidating this ADR.
+The specific URL mapping is already locked in [`docs/notes/redirects.md`](../notes/redirects.md). This ADR captures the *mechanism*, *policy*, and *cutover plan* — not the destination table itself, which is treated as living content and may evolve up to launch without invalidating this ADR.
 
 Constraints that apply:
 
@@ -67,7 +67,7 @@ Constraints that apply:
 
 **Two categories of URLs handled explicitly:**
 
-1. **Mapped URLs** — every old URL listed in [`docs/redirects.md`](../redirects.md) gets a 301 to its new home. The current list:
+1. **Mapped URLs** — every old URL listed in [`docs/notes/redirects.md`](../notes/redirects.md) gets a 301 to its new home. The current list:
    - `/services/` → `/`
    - `/parties/` → `/classes/`
    - `/tool-kits/` → `/supplies/`
@@ -99,7 +99,7 @@ No catch-all "redirect everything else to `/`" — Google treats catch-all-to-ho
 
 **Pre-launch validation** happens on the standard Vercel preview URL for the production branch. Concrete checks before flipping DNS:
 
-- Every entry in `docs/redirects.md` returns a 301 with the correct `Location` header.
+- Every entry in `docs/notes/redirects.md` returns a 301 with the correct `Location` header.
 - Every new-site route renders without error in the preview environment.
 - `sitemap.xml` and `robots.txt` are present and reflect the new URL inventory.
 - Admin auth works against the production Supabase project ([ADR-0006](./0006-authentication.md)).
@@ -123,7 +123,7 @@ No catch-all "redirect everything else to `/`" — Google treats catch-all-to-ho
 
 - **`trailingSlash: true` is the less common Next.js convention.** Some third-party Next.js examples and documentation assume `false`. Acceptable — the convention is fully supported, and any future developer can read this ADR to understand why.
 - **No fallback to WordPress.** A serious post-launch issue (e.g., a routing bug that breaks the admin) means fixing it in real time on the new site. Acceptable because (a) the pre-launch checklist mitigates most issues, (b) Vercel rollback-to-previous-deploy is one click for code regressions, and (c) the content is preserved in `/content/` regardless of WP's availability.
-- **Unmapped paths return 404.** Some inbound links to retired WP URLs that aren't in `docs/redirects.md` will break. Acceptable; the redirects table covers every known top-level page, and the long tail of "what if someone linked to a tag archive page" is genuinely marginal.
+- **Unmapped paths return 404.** Some inbound links to retired WP URLs that aren't in `docs/notes/redirects.md` will break. Acceptable; the redirects table covers every known top-level page, and the long tail of "what if someone linked to a tag archive page" is genuinely marginal.
 - **No formal SEO recovery plan if rankings drop post-cutover.** The expectation is that proper 301s + a clean sitemap + Search Console resubmission keep equity intact. If rankings do regress, recovery is a `fix-forward` exercise (audit redirects, check `robots.txt`, verify canonical tags). Acceptable scope for a small-business site.
 - **`redirects.md` and `next.config.ts` must stay in sync.** The mapping table is the human-readable source of truth; the function is the runtime enforcement. Drift between them is a real risk. Mitigation: a comment in `next.config.ts` referencing the table, and any redirect changes go to both files in the same commit. Considered (and rejected for now) generating `next.config.ts` entries directly from the markdown table at build time — premature given the small number of redirects.
 
@@ -131,4 +131,4 @@ No catch-all "redirect everything else to `/`" — Google treats catch-all-to-ho
 
 - Depends on: [ADR-0001](./0001-frontend-framework.md) (Next.js `redirects()` and `trailingSlash` config), [ADR-0002](./0002-hosting-platform.md) (Vercel as the new origin; public preview URLs for pre-launch validation), [ADR-0015](./0015-content-modeling-classes.md), [ADR-0016](./0016-content-modeling-bulletin-board.md), [ADR-0017](./0017-content-modeling-patterns-catalog.md) (the new URL inventory the redirects target).
 - Influences: SEO & schema markup (next ADR; sitemap generation source, canonical URL strategy, robots.txt posture all depend on this ADR's URL scheme and trailing-slash policy).
-- Document of record: [`docs/redirects.md`](../redirects.md) (mapping table); kept in sync with `next.config.ts`.
+- Document of record: [`docs/notes/redirects.md`](../notes/redirects.md) (mapping table); kept in sync with `next.config.ts`.

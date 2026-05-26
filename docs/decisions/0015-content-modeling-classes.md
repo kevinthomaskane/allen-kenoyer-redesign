@@ -6,7 +6,7 @@
 
 ## Context
 
-[ADR-0004](./0004-admin-dashboard-architecture.md) committed to a custom-built admin managing exactly two content types: classes and bulletin posts. The field list for classes is documented in `docs/current-pages-for-kristin.txt` (name, category, skill level, prerequisite, description, sessions, dates/times, tuition, supply fee, kit fee, max students, published/draft).
+[ADR-0004](./0004-admin-dashboard-architecture.md) committed to a custom-built admin managing exactly two content types: classes and bulletin posts. The field list for classes is documented in `docs/archive/current-pages-for-kristin.txt` (name, category, skill level, prerequisite, description, sessions, dates/times, tuition, supply fee, kit fee, max students, published/draft).
 
 This ADR locks the *shape* of the class content model — how those fields are structured into tables, how a class relates to its scheduled offerings, what the visibility semantics are, and what enums/types each field uses. The field list itself is settled; the modeling decisions below cascade into the schema migration ([ADR-0005](./0005-database-and-query-layer.md)), the admin UI surface ([ADR-0004](./0004-admin-dashboard-architecture.md)), and the future SEO/schema markup ADR (`Course`/`Event` structured data).
 

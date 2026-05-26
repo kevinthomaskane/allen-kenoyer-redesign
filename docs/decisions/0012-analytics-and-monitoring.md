@@ -8,7 +8,7 @@
 
 The site needs *some* level of operational visibility — at minimum, traffic data to inform SEO and content decisions. Beyond that, error tracking, performance monitoring, and uptime monitoring are all optional layers that improve operational confidence at varying cost in tooling complexity and client-side weight.
 
-The SEO research (`docs/seo-research.md`) establishes traffic insight as the primary analytics need. The admin dashboard introduces a real surface area where silent client-side bugs would matter, raising the question of dedicated error tracking.
+The SEO research (`docs/notes/seo-research.md`) establishes traffic insight as the primary analytics need. The admin dashboard introduces a real surface area where silent client-side bugs would matter, raising the question of dedicated error tracking.
 
 ## Options considered
 

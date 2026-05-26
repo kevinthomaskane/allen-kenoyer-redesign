@@ -12,7 +12,7 @@ Neither ADR specifies *how* Kristin moves through the UI to create those records
 
 Two design tensions shape the work:
 
-1. **Data model vs. mental model.** ADR-0015 introduced cohorts as a separate tier to handle concurrent runs of the same class (Tuesday-evening cohort vs. Saturday-morning cohort of "Beginning Copper Foil"). Kristin's onboarding doc (`docs/current-pages-for-kristin.txt`) describes the workflow more flatly — dates feel like a property of the class, not a separate entity. The UI must reconcile the explicit data shape with the simpler mental model.
+1. **Data model vs. mental model.** ADR-0015 introduced cohorts as a separate tier to handle concurrent runs of the same class (Tuesday-evening cohort vs. Saturday-morning cohort of "Beginning Copper Foil"). Kristin's onboarding doc (`docs/archive/current-pages-for-kristin.txt`) describes the workflow more flatly — dates feel like a property of the class, not a separate entity. The UI must reconcile the explicit data shape with the simpler mental model.
 2. **Multi-week courses vs. one-off workshops.** The studio's class list mixes 5-week structured courses ("Beginning Copper Foil") with drop-in workshops ("3-D Beveled Star", "Cutting Class"). Forcing every class through the same multi-session cohort flow would add friction for the workshop case; ignoring the distinction would lose useful frontend rendering signal.
 
 Constraints that apply:
