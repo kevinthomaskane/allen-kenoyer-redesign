@@ -25,7 +25,7 @@ When an ADR amendment lands, it appears as an `### Amendment YYYY-MM-DD — <tit
 ## Current build state (verify with `git log` / `docs/implementation-plan.md`)
 
 - **Phase 0 (Foundation)** — complete. Repo, tooling, CI, deploy pipeline.
-- **Phase 1 (Public Marketing Site)** — Chunk A complete (Supabase Storage + image migration). Chunks B (layout/nav), C (content routes), D (patterns) pending.
+- **Phase 1 (Public Marketing Site)** — complete (all four chunks shipped: A = Supabase Storage + image migration, B = layout chrome + nav, C = 9 conventional content routes, D = patterns catalog + category routes).
 - **Phase 2 (Admin/CMS)**, **Phase 3 (Forms & Integrations)**, **Phase 4 (Launch)** — not started.
 
 Phased execution is sequential by default. Don't start Phase N+1 work until Phase N's exit criteria are met.
