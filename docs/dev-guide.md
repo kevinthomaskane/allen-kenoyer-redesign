@@ -120,6 +120,21 @@ ADR anchor: [ADR-0007](./decisions/0007-image-pipeline-and-storage.md) commits t
 
 ---
 
+## Import boundaries — what `src/` may import from
+
+**`src/` code may not import from `content/`, `scripts/`, `docs/`, `demo/`, or `.agents/`.** Those directories are listed in [`.vercelignore`](../.vercelignore) and are not uploaded to Vercel — an import from any of them resolves locally but fails the production build with "Module not found."
+
+This trips even read-only data imports. A line like `import manifest from "../../content/manifest.json"` looks harmless locally (the JSON exists on disk, Turbopack bundles it) but breaks the Vercel build because the file never reaches the build environment. Caught and fixed once in Chunk C; the rule exists to prevent the next instance.
+
+**If `src/` needs data that lives in one of those directories:**
+
+- Hand-port the data into a typed module in `src/lib/` (what `src/lib/classes-content.ts` does for the legacy classes content). Best when the data is small, stable, and authoritative living next to the code that uses it.
+- Write a build-time generation script in `scripts/` that reads from the excluded directory and writes a generated `.ts` file into `src/lib/`. Run as a `prebuild` step. Worth the indirection only when the source data churns and re-derivation is meaningfully cheaper than hand-port.
+
+The ignore list itself is short and shouldn't grow without a reason — every entry is a directory whose contents are useful at *dev/build time* but not at runtime. If a future addition genuinely needs to ship to Vercel, prefer relocating it under `src/` or `public/` over loosening `.vercelignore`.
+
+---
+
 ## Container component
 
 **Location:** [`src/components/container.tsx`](../src/components/container.tsx).
