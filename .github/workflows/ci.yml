@@ -43,6 +43,14 @@ jobs:
   e2e:
     name: Playwright E2E
     runs-on: ubuntu-latest
+    # Publishable Supabase keys (NEXT_PUBLIC_*) are needed by the dev server
+    # the Playwright job spins up — next/image needs the bucket URL to build
+    # image src values. These ship to every browser in production already, so
+    # they live as repository Variables, not Secrets. Set under
+    # Repo → Settings → Secrets and variables → Actions → Variables.
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: ${{ vars.NEXT_PUBLIC_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ vars.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY }}
     steps:
       - uses: actions/checkout@v4
 
