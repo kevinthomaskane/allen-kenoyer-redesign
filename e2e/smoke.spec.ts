@@ -72,7 +72,7 @@ test("home page hero loads an image via next/image from Supabase Storage", async
 }) => {
   await page.goto("/");
   const heroImage = page.getByRole("img", {
-    name: /arched beveled stained glass/i,
+    name: /peacock stained glass double door/i,
   });
   await expect(heroImage).toBeVisible();
   // next/image rewrites src to /_next/image?url=...&w=...&q=... — assert
