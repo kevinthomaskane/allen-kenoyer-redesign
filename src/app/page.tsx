@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
-import { Clock, MapPin, Phone, Star } from "lucide-react";
+import { Star } from "lucide-react";
 import { Container } from "@/components/container";
 import { Reveal } from "@/components/motion/reveal";
 import { siteImageUrl } from "@/lib/site-images";
@@ -142,126 +142,94 @@ export default function HomePage() {
 
 function Hero() {
   return (
-    <section className="bg-cream relative overflow-hidden">
-      <Container className="relative py-12 md:py-20">
-        <div className="grid items-center gap-12 md:grid-cols-[1.1fr_1fr] md:gap-16">
-          <div>
-            <p className="text-accent-gold mb-3 text-xs font-semibold tracking-[3.5px] uppercase">
-              Lawndale, California · Founded 1978
-            </p>
-            <h1 className="text-primary font-serif text-4xl leading-tight sm:text-5xl md:text-6xl">
-              Allen Kenoyer{" "}
-              <em className="text-primary-light not-italic">Glass</em>
-            </h1>
-            <p className="text-text-mid mt-6 max-w-xl text-lg leading-relaxed">
-              Custom stained glass windows, doors &amp; panels. Hands-on classes
-              in copper foil, lead came, mosaics &amp; fused glass. Expert
-              repairs and art glass supplies — serving the South Bay and Greater
-              Los Angeles for over 47 years.
-            </p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Link
-                href="/classes"
-                className="bg-primary text-primary-foreground hover:bg-primary-light inline-flex items-center gap-2 rounded-md px-6 py-3 text-base font-semibold transition-colors"
-              >
-                Explore our classes
-              </Link>
-              <Link
-                href="/custom-design"
-                className="border-primary text-primary hover:bg-primary hover:text-primary-foreground inline-flex items-center gap-2 rounded-md border px-6 py-3 text-base font-semibold transition-colors"
-              >
-                Request a custom design
-              </Link>
-            </div>
-            <VisitCard className="mt-8 md:mt-10" />
+    <section className="hero-bg-gradient relative isolate flex min-h-[88vh] items-center overflow-hidden">
+      <Image
+        src={siteImageUrl("home", "ak-store-front_1000x492.jpg")}
+        alt=""
+        fill
+        priority
+        sizes="100vw"
+        aria-hidden
+        className="absolute inset-0 -z-10 scale-[1.06] object-cover object-[center_30%] opacity-[0.08] blur-[2px]"
+      />
+      <Container className="relative z-10 grid w-full items-center gap-12 py-24 md:grid-cols-2 md:gap-20 md:py-28">
+        <div className="text-white">
+          <p className="text-accent-gold-light mb-5 text-xs font-semibold tracking-[3px] uppercase">
+            Lawndale, California · Founded 1978
+          </p>
+          <h1 className="font-serif text-5xl leading-[1.12] font-bold sm:text-6xl md:text-7xl">
+            Allen Kenoyer{" "}
+            <em className="text-accent-gold-light italic">Glass</em>
+          </h1>
+          <p className="mt-6 max-w-md text-base leading-[1.85] font-light text-white/90 sm:text-lg">
+            Custom stained glass windows, doors &amp; panels. Hands-on classes
+            in copper foil, lead came, mosaics &amp; fused glass. Expert repairs
+            and art glass supplies — serving the South Bay and Greater Los
+            Angeles for over 47 years.
+          </p>
+          <div className="mt-10 flex flex-wrap gap-5">
+            <Link
+              href="/classes"
+              className="from-primary to-primary-light shadow-primary/30 inline-flex items-center rounded-full bg-gradient-to-br px-9 py-4 text-base font-semibold text-white shadow-lg transition-transform hover:-translate-y-1"
+            >
+              Explore our classes
+            </Link>
+            <Link
+              href="/custom-design"
+              className="inline-flex items-center rounded-full border-[1.5px] border-white/55 bg-white/15 px-9 py-4 text-base font-semibold text-white backdrop-blur-sm transition hover:-translate-y-1 hover:border-white hover:bg-white/25"
+            >
+              Request a custom design
+            </Link>
           </div>
+        </div>
 
-          <Reveal direction="right">
-            <div className="relative mx-auto aspect-[4/5] w-full max-w-md md:mx-0 md:ml-auto">
-              <div className="bg-accent-rose/40 absolute -top-4 -left-4 size-24 rounded-full blur-3xl" />
-              <div className="bg-primary-light/30 absolute -right-6 -bottom-6 size-32 rounded-full blur-3xl" />
-              <div className="bg-accent-gold/30 absolute top-1/3 left-1/2 size-20 rounded-full blur-3xl" />
-              <div className="relative grid h-full grid-cols-6 grid-rows-6 gap-3">
-                <div className="bg-cream-alt relative col-span-4 row-span-4 overflow-hidden rounded-xl shadow-lg">
-                  <Image
-                    src={siteImageUrl("home", "akarchedBevels.jpg")}
-                    alt="Arched beveled stained glass panel by Allen Kenoyer Glass"
-                    fill
-                    sizes="(min-width: 768px) 320px, 80vw"
-                    className="object-cover"
-                    priority
-                  />
-                </div>
-                <div className="bg-cream-alt relative col-span-3 col-start-4 row-span-3 row-start-4 overflow-hidden rounded-xl shadow-lg">
-                  <Image
-                    src={siteImageUrl("home", "aklilies-th.jpg")}
-                    alt="Lilies stained glass panel"
-                    fill
-                    sizes="(min-width: 768px) 240px, 60vw"
-                    className="object-cover"
-                  />
-                </div>
-                <div className="bg-cream-alt relative col-span-2 col-start-5 row-span-2 row-start-1 overflow-hidden rounded-xl shadow-lg">
-                  <Image
-                    src={siteImageUrl("home", "akbevels2-th.jpg")}
-                    alt="Etched glass bevels"
-                    fill
-                    sizes="(min-width: 768px) 160px, 40vw"
-                    className="object-cover"
-                  />
-                </div>
-              </div>
+        <Reveal direction="right">
+          <div className="relative mx-auto h-[480px] w-full max-w-md md:mx-0 md:ml-auto">
+            <span className="glass-gem gem-purple" aria-hidden />
+            <span className="glass-gem gem-rose" aria-hidden />
+            <span className="glass-gem gem-gold" aria-hidden />
+            <div className="absolute top-0 left-0 z-30 h-[420px] w-[58%] -rotate-2 overflow-hidden rounded-2xl border-4 border-white/20 shadow-2xl shadow-black/40">
+              <Image
+                src={siteImageUrl(
+                  "home",
+                  "peacock-stained-glass-double-door_500x717.jpg",
+                )}
+                alt="Peacock stained glass double door panels by Allen Kenoyer Glass"
+                fill
+                sizes="(min-width: 768px) 290px, 55vw"
+                className="object-cover"
+                priority
+              />
             </div>
-          </Reveal>
-        </div>
+            <div className="absolute top-[30px] right-0 z-20 h-[340px] w-[44%] rotate-3 overflow-hidden rounded-2xl border-4 border-white/20 shadow-2xl shadow-black/35">
+              <Image
+                src={siteImageUrl(
+                  "home",
+                  "tulip-floral-stained-glass-window_500x717.jpg",
+                )}
+                alt="Tulip floral stained glass window custom design"
+                fill
+                sizes="(min-width: 768px) 220px, 44vw"
+                className="object-cover"
+              />
+            </div>
+            <div className="absolute right-[18%] -bottom-5 z-40 h-[220px] w-[38%] -rotate-1 overflow-hidden rounded-2xl border-4 border-white/20 shadow-2xl shadow-black/40">
+              <Image
+                src={siteImageUrl(
+                  "home",
+                  "ocean-dolphin-stained-glass-door-sidelights_500x717.jpg",
+                )}
+                alt="Ocean dolphin stained glass door sidelights"
+                fill
+                sizes="(min-width: 768px) 190px, 38vw"
+                className="object-cover"
+              />
+            </div>
+          </div>
+        </Reveal>
       </Container>
+      <div className="hero-rainbow-strip absolute right-0 bottom-0 left-0 z-30 h-[7px]" />
     </section>
-  );
-}
-
-function VisitCard({ className }: { className?: string }) {
-  return (
-    <div
-      className={`bg-card rounded-lg border border-black/5 p-5 shadow-sm ${className ?? ""}`}
-    >
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div>
-          <p className="text-accent-gold flex items-center gap-2 text-xs font-semibold tracking-[2px] uppercase">
-            <Clock className="size-4" aria-hidden /> Today &amp; this week
-          </p>
-          <ul className="text-text mt-3 space-y-1 text-sm">
-            {siteContact.hours.map((h) => (
-              <li key={h.days} className="grid grid-cols-[1fr_auto] gap-x-3">
-                <span className="text-text-mid">{h.days}</span>
-                <span className="font-medium">{h.time}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-        <div>
-          <p className="text-accent-gold flex items-center gap-2 text-xs font-semibold tracking-[2px] uppercase">
-            <MapPin className="size-4" aria-hidden /> Visit the studio
-          </p>
-          <a
-            href={siteContact.address.mapHref}
-            target="_blank"
-            rel="noopener"
-            className="text-text hover:text-primary mt-3 block text-sm leading-relaxed transition-colors"
-          >
-            {siteContact.address.line1}
-            <br />
-            {siteContact.address.line2}
-          </a>
-          <a
-            href={siteContact.phoneHref}
-            className="text-primary hover:text-primary-light mt-2 inline-flex items-center gap-1.5 text-sm font-semibold transition-colors"
-          >
-            <Phone className="size-3.5" aria-hidden />
-            {siteContact.phone}
-          </a>
-        </div>
-      </div>
-    </div>
   );
 }
 
@@ -277,21 +245,29 @@ function TrustBar() {
           <Star className="text-accent-gold size-5 fill-current" aria-hidden />
         </span>
       ),
-      label: "Average customer rating (70+ reviews)",
+      label: "Average customer rating",
     },
   ];
   return (
-    <section className="bg-plum-dark text-cream py-8 md:py-10">
+    <section className="border-primary/10 border-b bg-white py-10 md:py-12">
       <Container>
-        <ul className="grid grid-cols-2 gap-x-4 gap-y-6 md:grid-cols-4">
+        <ul className="flex flex-wrap items-center justify-center gap-x-0 gap-y-6">
           {items.map((item, i) => (
-            <li key={i} className="text-center">
-              <p className="text-accent-gold-light font-serif text-3xl md:text-4xl">
-                {item.num}
-              </p>
-              <p className="text-cream/85 mt-1 text-xs sm:text-sm">
-                {item.label}
-              </p>
+            <li key={i} className="flex items-center">
+              <div className="px-6 text-center md:px-14">
+                <p className="text-primary font-serif text-3xl font-bold md:text-4xl">
+                  {item.num}
+                </p>
+                <p className="text-text-mid mt-2 text-[0.72rem] font-medium tracking-[2px] uppercase">
+                  {item.label}
+                </p>
+              </div>
+              {i < items.length - 1 && (
+                <span
+                  aria-hidden
+                  className="via-primary/20 hidden h-[52px] w-px bg-gradient-to-b from-transparent to-transparent md:block"
+                />
+              )}
             </li>
           ))}
         </ul>
@@ -355,7 +331,7 @@ function Services() {
 
 function About() {
   return (
-    <section className="bg-cream-alt py-20 md:py-28">
+    <section className="bg-white py-20 md:py-28">
       <Container>
         <div className="grid items-center gap-12 md:grid-cols-2 md:gap-16">
           <Reveal direction="right">
@@ -437,7 +413,7 @@ function About() {
 
 function Gallery() {
   return (
-    <section className="py-20 md:py-28">
+    <section className="bg-cream-alt py-20 md:py-28">
       <Container>
         <div className="mx-auto max-w-2xl text-center">
           <p className="text-accent-gold mb-3 text-xs font-semibold tracking-[3.5px] uppercase">
@@ -484,7 +460,7 @@ function Gallery() {
 
 function Testimonials() {
   return (
-    <section className="bg-primary-pale py-20 md:py-28">
+    <section className="bg-white py-20 md:py-28">
       <Container>
         <div className="mx-auto max-w-2xl text-center">
           <p className="text-accent-gold mb-3 text-xs font-semibold tracking-[3.5px] uppercase">
@@ -501,16 +477,11 @@ function Testimonials() {
         <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {TESTIMONIALS.map((t, i) => (
             <Reveal key={i} delay={i * 0.05}>
-              <blockquote className="bg-card flex h-full flex-col rounded-lg border border-black/5 p-6 shadow-sm">
-                <div className="text-accent-gold flex gap-0.5" aria-hidden>
-                  {Array.from({ length: 5 }).map((_, j) => (
-                    <Star key={j} className="size-4 fill-current" />
-                  ))}
-                </div>
-                <p className="text-text mt-4 flex-1 text-base leading-relaxed italic">
+              <blockquote className="bg-cream border-accent-gold flex h-full flex-col rounded-xl border-l-4 px-8 py-10">
+                <p className="text-text-mid flex-1 text-[0.95rem] leading-[1.85] italic">
                   &ldquo;{t.quote}&rdquo;
                 </p>
-                <cite className="text-text-mid mt-5 block text-sm not-italic">
+                <cite className="text-primary mt-5 block text-sm font-semibold not-italic">
                   &mdash; {t.author}
                 </cite>
               </blockquote>
@@ -523,45 +494,40 @@ function Testimonials() {
 }
 
 function ClassesBanner() {
+  const pricing = [
+    "Workshops from $15",
+    "Private instruction available",
+    "All supplies in-store",
+  ];
   return (
-    <section className="py-20 md:py-24">
+    <section className="py-20 md:py-28">
       <Container>
         <Reveal>
-          <div className="bg-plum-dark text-cream relative overflow-hidden rounded-xl px-8 py-14 text-center md:px-12 md:py-20">
-            <p className="text-accent-gold-light mb-3 text-xs font-semibold tracking-[3.5px] uppercase">
+          <div className="classes-banner-bg relative overflow-hidden rounded-3xl px-8 py-20 text-center text-white md:px-20 md:py-24">
+            <p className="text-accent-gold-light relative z-10 mb-5 text-xs font-semibold tracking-[3px] uppercase">
               Stained glass classes in Los Angeles
             </p>
-            <h2 className="font-serif text-3xl sm:text-4xl">
+            <h2 className="relative z-10 font-serif text-3xl sm:text-4xl md:text-5xl">
               Ready to create something beautiful?
             </h2>
-            <p className="text-cream/85 mx-auto mt-5 max-w-2xl text-base leading-relaxed">
+            <p className="relative z-10 mx-auto mt-6 max-w-2xl text-base leading-[1.85] font-light text-white/90 sm:text-lg">
               Our classes are perfect for beginners and experienced crafters
               alike. Learn copper foil, lead came, mosaics, glass fusing, and
               slumping in a warm, supportive studio.
             </p>
-            <ul className="text-cream/90 mt-8 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-sm sm:text-base">
-              <li className="flex items-center gap-2">
-                <span className="text-accent-gold" aria-hidden>
-                  ✦
-                </span>
-                Workshops from $15
-              </li>
-              <li className="flex items-center gap-2">
-                <span className="text-accent-gold" aria-hidden>
-                  ✦
-                </span>
-                Private instruction available
-              </li>
-              <li className="flex items-center gap-2">
-                <span className="text-accent-gold" aria-hidden>
-                  ✦
-                </span>
-                All supplies in-store
-              </li>
+            <ul className="relative z-10 mt-10 flex flex-wrap justify-center gap-3 text-sm">
+              {pricing.map((p) => (
+                <li
+                  key={p}
+                  className="rounded-full border border-white/30 bg-white/15 px-6 py-2 font-medium text-white backdrop-blur-sm"
+                >
+                  + {p}
+                </li>
+              ))}
             </ul>
             <Link
               href="/classes"
-              className="bg-accent-gold text-plum-dark hover:bg-accent-gold-light mt-10 inline-flex items-center gap-2 rounded-md px-6 py-3 text-base font-semibold transition-colors"
+              className="text-primary hover:bg-accent-gold relative z-10 mt-12 inline-flex items-center rounded-full bg-white px-9 py-4 text-sm font-bold tracking-[1px] uppercase shadow-lg shadow-black/15 transition hover:-translate-y-1 hover:text-white"
             >
               See our class schedule
             </Link>
@@ -574,60 +540,53 @@ function ClassesBanner() {
 
 function VisitSection() {
   return (
-    <section className="bg-cream-alt py-20 md:py-24">
+    <section className="bg-cream py-20 md:py-28">
       <Container>
-        <div className="grid gap-12 md:grid-cols-2 md:gap-16">
+        <div className="grid gap-12 md:grid-cols-2 md:gap-20">
           <Reveal>
             <div>
-              <p className="text-accent-gold mb-3 text-xs font-semibold tracking-[3.5px] uppercase">
+              <p className="text-accent-gold mb-3 text-xs font-semibold tracking-[3px] uppercase">
                 Visit our Lawndale studio
               </p>
-              <h2 className="text-primary font-serif text-3xl sm:text-4xl">
+              <h2 className="text-primary font-serif text-3xl sm:text-4xl md:text-5xl">
                 Come see us
               </h2>
-              <div className="bg-card mt-8 rounded-lg border border-black/5 p-6 shadow-sm">
-                <a
-                  href={siteContact.address.mapHref}
-                  target="_blank"
-                  rel="noopener"
-                  className="text-text hover:text-primary block text-lg font-medium transition-colors"
-                >
-                  {siteContact.address.line1}
-                  <br />
-                  {siteContact.address.line2}
-                </a>
-                <p className="text-text-mid mt-2 text-sm italic">
-                  Enter from rear parking lot.
-                </p>
-              </div>
-              <ul className="mt-6 space-y-3 text-base">
+              <a
+                href={siteContact.address.mapHref}
+                target="_blank"
+                rel="noopener"
+                className="text-text hover:text-primary mt-8 block text-lg leading-relaxed transition-colors"
+              >
+                {siteContact.address.line1}
+                <br />
+                {siteContact.address.line2}
+              </a>
+              <p className="text-text-mid mt-2 text-base italic">
+                Enter from rear parking lot
+              </p>
+              <ul className="text-text mt-8 space-y-2 text-base">
                 <li>
+                  <span className="text-text-mid">Phone: </span>
                   <a
                     href={siteContact.phoneHref}
-                    className="text-text hover:text-primary inline-flex items-center gap-3 transition-colors"
+                    className="text-primary hover:text-primary-light font-semibold transition-colors"
                   >
-                    <Phone className="text-accent-gold size-5" aria-hidden />
                     {siteContact.phone}
                   </a>
                 </li>
                 <li>
+                  <span className="text-text-mid">Email: </span>
                   <a
                     href={siteContact.emailHref}
-                    className="text-text hover:text-primary inline-flex items-center gap-3 transition-colors"
+                    className="text-primary hover:text-primary-light font-semibold transition-colors"
                   >
-                    <span
-                      className="text-accent-gold w-5 text-center"
-                      aria-hidden
-                    >
-                      @
-                    </span>
                     {siteContact.email}
                   </a>
                 </li>
               </ul>
               <a
                 href={siteContact.emailHref}
-                className="bg-primary text-primary-foreground hover:bg-primary-light mt-8 inline-flex items-center gap-2 rounded-md px-6 py-3 text-base font-semibold transition-colors"
+                className="from-primary to-primary-light shadow-primary/30 mt-10 inline-flex items-center rounded-full bg-gradient-to-br px-8 py-3.5 text-sm font-bold tracking-[1px] text-white uppercase shadow-lg transition hover:-translate-y-1"
               >
                 Send us an email
               </a>
@@ -635,30 +594,30 @@ function VisitSection() {
           </Reveal>
 
           <Reveal direction="left">
-            <div className="bg-card rounded-lg border border-black/5 p-6 shadow-sm md:p-8">
-              <h3 className="text-primary font-serif text-2xl">
+            <div className="bg-card border-accent-gold relative rounded-2xl border-t-4 p-8 shadow-sm md:p-10">
+              <h3 className="text-primary font-serif text-2xl md:text-3xl">
                 Hours of operation
               </h3>
-              <ul className="text-text mt-6 space-y-3 text-base">
+              <ul className="text-text mt-6 space-y-4 text-base">
                 {siteContact.hours.map((h) => (
                   <li
                     key={h.days}
-                    className="border-primary/10 grid grid-cols-[1fr_auto] gap-4 border-b pb-3 last:border-none last:pb-0"
+                    className="border-primary/15 grid grid-cols-[1fr_auto] gap-4 border-b border-dashed pb-4 last:border-none last:pb-0"
                   >
                     <span className="text-text-mid">{h.days}</span>
-                    <span className="font-medium">{h.time}</span>
+                    <span className="font-semibold">{h.time}</span>
                   </li>
                 ))}
               </ul>
-              <div className="border-primary/10 mt-8 border-t pt-6">
-                <p className="text-text text-base leading-relaxed">
+              <div className="mt-8 text-center">
+                <p className="text-text-mid text-base italic">
                   Stay inspired — get updates on classes &amp; new designs.
                 </p>
                 <a
                   href={newsletter.signupHref}
                   target="_blank"
                   rel="noopener"
-                  className="bg-accent-gold text-plum-dark hover:bg-accent-gold-light mt-4 inline-flex items-center gap-2 rounded-md px-6 py-3 text-base font-semibold transition-colors"
+                  className="bg-accent-gold hover:bg-accent-gold-light mt-4 inline-flex items-center rounded-full px-8 py-3.5 text-sm font-bold tracking-[1px] text-white uppercase shadow-md transition hover:-translate-y-1"
                 >
                   Subscribe to our newsletter
                 </a>

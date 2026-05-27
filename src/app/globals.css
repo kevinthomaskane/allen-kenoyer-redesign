@@ -120,3 +120,115 @@ h4 {
   font-family: var(--font-serif);
   line-height: 1.2;
 }
+
+/*
+ * Hero recipes — one-off backgrounds for the homepage hero.
+ * Hex literals live here (per the dev-guide) instead of being scattered
+ * through JSX. Brand stops use var() tokens; intermediate purple
+ * stops (#5e287f, #7a48a8) and the rainbow strip hexes are demo-defined
+ * and not part of the brand palette.
+ */
+.hero-bg-gradient {
+  background:
+    radial-gradient(
+      ellipse 60% 60% at 15% 65%,
+      rgba(212, 165, 181, 0.28) 0%,
+      transparent 60%
+    ),
+    radial-gradient(
+      ellipse 50% 50% at 80% 25%,
+      rgba(197, 151, 90, 0.18) 0%,
+      transparent 55%
+    ),
+    radial-gradient(
+      ellipse 45% 55% at 65% 80%,
+      rgba(155, 114, 192, 0.22) 0%,
+      transparent 50%
+    ),
+    linear-gradient(140deg, #2e1540 0%, #5e287f 55%, #7a48a8 100%);
+}
+
+.hero-rainbow-strip {
+  background: linear-gradient(
+    90deg,
+    #a030c0 0%,
+    #7050cc 14%,
+    #4090d8 28%,
+    #40b860 42%,
+    #d0c840 56%,
+    #e88020 70%,
+    #d03060 85%,
+    #a030c0 100%
+  );
+}
+
+/*
+ * Classes-banner recipe: a brighter purple gradient (distinct from the
+ * hero's deeper plum start) with soft radial washes and a tiny SVG
+ * cross-hatch pattern overlay, per demo `.classes-banner`.
+ */
+.classes-banner-bg {
+  background:
+    url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.035'%3E%3Cpath d='M20 20.5V18h-1v2.5L17 18h-1.5l2 3-2 3H17l2-2.5V24h1v-2.5l2 2.5h1.5l-2-3 2-3H23l-2 2.5z'/%3E%3C/g%3E%3C/svg%3E"),
+    radial-gradient(
+      ellipse 55% 60% at 8% 55%,
+      rgba(212, 165, 181, 0.22) 0%,
+      transparent 55%
+    ),
+    radial-gradient(
+      ellipse 45% 50% at 92% 20%,
+      rgba(197, 151, 90, 0.15) 0%,
+      transparent 55%
+    ),
+    linear-gradient(135deg, #4a1a7a 0%, #7038b8 55%, #9058c8 100%);
+}
+
+/*
+ * Decorative jewel blobs floating around the hero glass-card cluster.
+ * Sized + positioned absolutely by the parent .hero-glass-cluster.
+ */
+.glass-gem {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(1px);
+}
+.glass-gem.gem-purple {
+  width: 4.5rem;
+  height: 4.5rem;
+  top: -1.4rem;
+  right: -1.1rem;
+  opacity: 0.75;
+  background: radial-gradient(
+    circle at 35% 35%,
+    rgba(185, 140, 220, 0.9),
+    rgba(107, 63, 160, 0.3)
+  );
+  border: 2px solid rgba(255, 255, 255, 0.28);
+}
+.glass-gem.gem-rose {
+  width: 3rem;
+  height: 3rem;
+  bottom: 1.5rem;
+  left: -1.4rem;
+  opacity: 0.7;
+  background: radial-gradient(
+    circle at 35% 35%,
+    rgba(240, 180, 200, 0.95),
+    rgba(212, 165, 181, 0.3)
+  );
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}
+.glass-gem.gem-gold {
+  width: 2rem;
+  height: 2rem;
+  bottom: -0.5rem;
+  right: 2.25rem;
+  opacity: 0.75;
+  background: radial-gradient(
+    circle at 35% 35%,
+    rgba(240, 220, 170, 0.95),
+    rgba(197, 151, 90, 0.35)
+  );
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}

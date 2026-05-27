@@ -7,10 +7,11 @@ import { siteContact } from "@/lib/site-config";
 // are clickable: address opens Google Maps directions, phone is a tel: link.
 //
 // Older-audience considerations: generous tap targets, text never smaller
-// than 14px, high-contrast plum-dark background against cream below.
+// than 14px, high-contrast primary background against cream below — color
+// matched to the phone CTA in SiteNav.
 export function InfoBar() {
   return (
-    <div className="bg-plum-dark text-cream border-b border-black/10 py-2 text-sm">
+    <div className="bg-primary text-primary-foreground border-b border-black/10 py-2 text-sm">
       <Container>
         <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-1 sm:justify-between md:justify-center">
           <a
