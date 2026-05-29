@@ -25,7 +25,7 @@ Open your task file. Read its `depends_on` frontmatter array. For each dependenc
 In order:
 
 1. **The full task file.** Goal, Context, Scope (in/out), Test specs, Exit criteria — all of it.
-2. **Every ADR listed in `adrs_realized`** at `agent-orchestration/decisions/NNNN-*.md`. Read each in full, including any post-acceptance amendments at the bottom of the file.
+2. **Every ADR listed in `adrs_realized`** at `agent-orchestration/decisions/NNNN-*.md`. Read each in full — each ADR states the current decision (edited in place, no amendment log).
 3. **The dev-guide.** `agent-orchestration/dev-guide.md` is eager-loaded — read it once at session start. All rules apply to every code-touching task.
 
 The depth-of-context chain that brought you here (CLAUDE.md → `project-overview.md` → phase `README.md` → task file) doesn't need re-reading per task once internalized. Re-reach for `project-overview.md` or the phase `README.md` only if you need orientation outside the task's scope.

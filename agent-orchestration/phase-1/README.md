@@ -10,7 +10,7 @@ Stand up every public route the studio's site needs, with real (migrated) conten
 
 - [ADR-0007](../decisions/0007-image-pipeline-and-storage.md) — Supabase Storage for dev-managed and (future) admin-uploaded images, `next/image` optimization
 - [ADR-0008](../decisions/0008-styling-and-ui-layer.md) — Tailwind + shadcn patterns put into use (component primitives, layout chrome)
-- [ADR-0017](../decisions/0017-content-modeling-patterns-catalog.md) — Patterns catalog as dev-managed TS module + Supabase Storage at `patterns/[category]/` (per Amendment 2026-05-22; original `/public/` decision reversed)
+- [ADR-0017](../decisions/0017-content-modeling-patterns-catalog.md) — Patterns catalog as dev-managed TS module + Supabase Storage at `patterns/[category]/`
 - [ADR-0020](../decisions/0020-google-calendar-integration.md) — `/classes/calendar` embeds Kristin's existing public Google Calendar (the public surface is permanent; the admin → GCal sync that keeps it current ships in Phase 2)
 
 A later phase may extend an ADR's surface area without re-listing it.

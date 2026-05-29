@@ -145,7 +145,7 @@ The patterns catalog is dev-managed per [ADR-0017](./decisions/0017-content-mode
 
 **Source order is preserved.** Records are kept in `content/supplies/patterns/<category>/content.md` order. Don't sort the source array — consumers call `getPatternsByCategory(category)`, which sorts at consumption time via `Intl.Collator` with `numeric: true` so `#9 < #10 < #102 < #102C`.
 
-**Uniqueness is `(category, number)`, not bare `number`.** Per [ADR-0017 Amendment 2026-05-26](./decisions/0017-content-modeling-patterns-catalog.md), five numbers (`#105`, `#109`, `#111`, `#789`, `#805`) appear in more than one category. Invariants asserted by `src/lib/patterns.test.ts`; consumers must key off the pair.
+**Uniqueness is `(category, number)`, not bare `number`.** Per [ADR-0017](./decisions/0017-content-modeling-patterns-catalog.md), five numbers (`#105`, `#109`, `#111`, `#789`, `#805`) appear in more than one category. Invariants asserted by `src/lib/patterns.test.ts`; consumers must key off the pair.
 
 **Image URLs go through `patternImageUrl(pattern)`.** Don't hand-compose Supabase Storage URLs inline. The helper centralizes the `${NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/site-images/patterns/<category>/<image>` shape.
 

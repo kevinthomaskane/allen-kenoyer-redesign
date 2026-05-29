@@ -2,7 +2,7 @@
 
 WordPress-to-custom rebuild for **Allen Kenoyer Glass**, a Lawndale, CA stained-glass studio run by Kristin. Replaces the existing WP site with a custom Next.js app — public marketing surface + an authenticated admin/CMS for Kristin to manage class schedules and a bulletin board.
 
-**Locked scope:** no e-commerce, no online class registration. The frontend is largely static (content + portfolio + patterns catalog); the admin dashboard is the one dynamic surface and the core feature of the rebuild.
+**Locked scope:** no e-commerce, no online class registration. The frontend is largely static (content + portfolio + patterns catalog); the admin dashboard is the primary dynamic surface and the core feature of the rebuild.
 
 This document gives an agent the project context to do work; it does not duplicate `CLAUDE.md` (stack, commands, conventions, hard rules) or the individual phase READMEs (per-phase scope and exit criteria). Read it once at the start of a session that needs orientation beyond CLAUDE.md.
 
@@ -46,7 +46,7 @@ Vercel Web Analytics only ([ADR-0012](./decisions/0012-analytics-and-monitoring.
 
 The admin manages exactly two content types ([ADR-0004](./decisions/0004-admin-dashboard-architecture.md)):
 
-- **Classes** — two-tier: `classes` (named course template) → `cohorts` (specific run with a label and `kind` enum) → `cohort_sessions` (individual date+time rows). Public visibility requires class.published AND a published cohort AND that cohort having a future session ([ADR-0015](./decisions/0015-content-modeling-classes.md), [Amendment 2026-05-22](./decisions/0015-content-modeling-classes.md) for GCal sync columns).
+- **Classes** — two-tier: `classes` (named course template) → `cohorts` (specific run with a label and `kind` enum) → `cohort_sessions` (individual date+time rows). Public visibility requires class.published AND a published cohort AND that cohort having a future session ([ADR-0015](./decisions/0015-content-modeling-classes.md)).
 - **Bulletins** — single-table, markdown body, display window ([ADR-0016](./decisions/0016-content-modeling-bulletin-board.md)).
 
 The patterns catalog is **not** admin-managed — it lives as a typed `lib/patterns.ts` module per [ADR-0017](./decisions/0017-content-modeling-patterns-catalog.md). Adding/editing patterns is a code change.

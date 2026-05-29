@@ -41,11 +41,11 @@ Cohorts and sessions are managed inline on the class detail page. No standalone 
 - **"New cohort"** opens the multi-session cohort form (label, recurring session builder, per-row session edits, published toggle). Used for structured courses ("Beginning Copper Foil — Spring 2026, 5 Tuesday evenings").
 - **"New single session"** opens a simplified form (date + start time + end time + published toggle, no cohort label, no recurring builder). Used for one-off workshops. Behind the scenes, a `cohorts` row is auto-created with `kind = 'single_session'` plus exactly one `cohort_sessions` row.
 
-The dual entry point absorbs the data model's cohort tier into the UI without exposing it for the workshop case. The frontend branches rendering on `cohort.kind` (a column added by this ADR's acceptance — see [ADR-0015](./0015-content-modeling-classes.md)'s 2026-05-26 amendment).
+The dual entry point absorbs the data model's cohort tier into the UI without exposing it for the workshop case. The frontend branches rendering on `cohort.kind` (a column this ADR adds to [ADR-0015](./0015-content-modeling-classes.md)'s `cohorts` schema).
 
 ### C. Single-session distinction in the data
 
-**Decision: `kind` enum column on the `cohorts` table.** Values: `'multi_session' | 'single_session'`. Set on insert based on the admin's entry-point choice; immutable thereafter. This is a schema change against [ADR-0015](./0015-content-modeling-classes.md); the amendment landed there on this ADR's acceptance as `## Amendment 2026-05-26 — Cohort kind column`, alongside [ADR-0020](./0020-google-calendar-integration.md)'s prior 2026-05-22 amendment.
+**Decision: `kind` enum column on the `cohorts` table.** Values: `'multi_session' | 'single_session'`. Set on insert based on the admin's entry-point choice; immutable thereafter. This is a schema change folded into [ADR-0015](./0015-content-modeling-classes.md)'s `cohorts` table, alongside the GCal sync columns [ADR-0020](./0020-google-calendar-integration.md) drove.
 
 Alternatives considered and rejected:
 
@@ -175,10 +175,6 @@ Alternatives considered and rejected:
 
 ## Related decisions
 
-- Depends on: [ADR-0004](./0004-admin-dashboard-architecture.md) (admin platform), [ADR-0015](./0015-content-modeling-classes.md) (class data model — `kind` column proposed below).
+- Depends on: [ADR-0004](./0004-admin-dashboard-architecture.md) (admin platform), [ADR-0015](./0015-content-modeling-classes.md) (class data model — this ADR adds the `kind` column to its `cohorts` table).
 - Influences: Phase 2 of [`implementation-plan.md`](../implementation-plan.md) (the admin chunks will execute against this workflow), future SEO/schema markup work (the `kind` distinction may affect whether single-session offerings emit `Event` vs `Course` JSON-LD — to be revisited in the [ADR-0019](./0019-seo-and-schema-markup.md) implementation).
-- Coordinates with: [ADR-0020](./0020-google-calendar-integration.md) (Accepted 2026-05-22) — ADR-0020's amendment to [ADR-0015](./0015-content-modeling-classes.md) is in place (`label` NOT NULL dropped, three sync columns added on `cohort_sessions`). This ADR's `kind` column is complementary; its amendment landed as a second section in ADR-0015 (`## Amendment 2026-05-26 — Cohort kind column`) alongside the 2026-05-22 amendment.
-
-## Amendment landed in ADR-0015 on acceptance
-
-When this ADR moved from In Discussion to Accepted on 2026-05-26, the schema amendment it specified was applied to [ADR-0015](./0015-content-modeling-classes.md) as `## Amendment 2026-05-26 — Cohort kind column`. The amendment adds one column (`cohorts.kind`, enum `'multi_session' | 'single_session'`, immutable post-insert) and narrows the semantics of `cohorts.label` (required for multi-session, optional for single-session — refining the `NOT NULL` relaxation that [ADR-0020](./0020-google-calendar-integration.md)'s 2026-05-22 amendment already made at the column-constraint level). See ADR-0015 for the full amendment text.
+- Coordinates with: [ADR-0020](./0020-google-calendar-integration.md) — its GCal sync columns and the nullable `cohorts.label` are part of [ADR-0015](./0015-content-modeling-classes.md)'s schema; this ADR's `kind` column is complementary, adding the multi/single-session distinction the `label` semantics build on.

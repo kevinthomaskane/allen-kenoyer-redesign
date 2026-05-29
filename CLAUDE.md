@@ -1,43 +1,37 @@
 # CLAUDE.md
 
-Guidance for Claude Code when working with this repo. Substantive project context lives in [`agent-orchestration/project-overview.md`](./agent-orchestration/project-overview.md); per-task instructions in [`agent-orchestration/agent-protocol.md`](./agent-orchestration/agent-protocol.md); conventions in [`agent-orchestration/dev-guide.md`](./agent-orchestration/dev-guide.md).
+Root context for Claude Code, loaded every session. Everything else loads on
+demand — pull each doc when its trigger fires:
+
+- **Assigned a task** ("do task `02-admin-auth`") → read
+  [`agent-protocol.md`](./agent-orchestration/agent-protocol.md) and follow it;
+  it owns the read-order, status transitions, and completion contract (and
+  routes you on to the phase README, task file, and cited ADRs).
+- **Need orientation** beyond this file — what's shipped, the phase roadmap, the
+  data model → [`project-overview.md`](./agent-orchestration/project-overview.md).
+- **Writing code** → [`dev-guide.md`](./agent-orchestration/dev-guide.md) for
+  conventions (design tokens, motion, icons, import boundaries, naming).
+- **Making or citing a hard-to-reverse decision** →
+  [`decisions/`](./agent-orchestration/decisions/), the ADR log. Each ADR reads
+  as the current decision; changing one is Kevin's call, applied in place.
 
 ## What this project is
 
-WordPress-to-custom rebuild for **Allen Kenoyer Glass** (Lawndale, CA stained-glass studio). Public marketing site + authenticated admin/CMS for the studio manager (Kristin). **Locked scope:** no e-commerce, no online class registration. Frontend largely static; the admin dashboard is the one dynamic surface and the core feature.
-
-## Working on an assigned task
-
-When Kevin assigns you a task (e.g., "do task `01-admin-auth`"), read [`agent-orchestration/agent-protocol.md`](./agent-orchestration/agent-protocol.md) and follow it — it owns dep verification, citation reads, status transitions, completion, escalation. For broader project context, read [`agent-orchestration/project-overview.md`](./agent-orchestration/project-overview.md).
+WordPress-to-custom rebuild for **Allen Kenoyer Glass** (Lawndale, CA stained-glass studio). Public marketing site + authenticated admin/CMS for the studio manager (Kristin). **Locked scope:** no e-commerce, no online class registration. Frontend largely static; the admin dashboard is the primary dynamic surface and the core feature.
 
 ## Current state
 
-- Phase 0 (Foundation) ✓ shipped 2026-05-20
-- Phase 1 (Public Marketing Site) ✓ shipped 2026-05-26
-- Phases 2–4 not started
-
-Phased execution is sequential by default; don't start Phase N+1 until Phase N's exit criteria are met. Status table + summaries: [`project-overview.md`](./agent-orchestration/project-overview.md).
+Development is scoped into sequential phased builds — don't start a phase until
+the prior phase's exit criteria are met. For progress and current state, see
+[`project-overview.md`](./agent-orchestration/project-overview.md).
 
 ## Commands
 
-```bash
-pnpm dev               # Next.js dev server (Turbopack)
-pnpm build             # Production build
-pnpm lint              # ESLint
-pnpm format            # Prettier --write
-pnpm format:check      # Prettier --check (CI uses this)
-pnpm typecheck         # tsc --noEmit
-pnpm test              # Vitest run
-pnpm test:watch        # Vitest watch
-pnpm test:e2e          # Playwright E2E
-pnpm check             # lint + format:check + typecheck + vitest (mirrors CI)
-pnpm check:e2e         # pnpm check + Playwright
-pnpm migrate:images    # Idempotent re-run of non-pattern image migration
-pnpm migrate:patterns  # Idempotent re-run of pattern image migration
-pnpm gen:tracker       # Regenerate phase task trackers from task-file frontmatter
-```
+All scripts live in [`package.json`](./package.json) — run them with `pnpm <script>`
+rather than invoking the underlying tools (`eslint`, `prettier`, `tsc`, …)
+directly. The pre-push gate is `pnpm check` (mirrors CI; see Hard rules).
 
-Single Vitest test: `pnpm vitest run path/to/file.test.ts -t "test name pattern"`. Local E2E needs `pnpm exec playwright install` once.
+Single Vitest test: `pnpm vitest run path/to/file.test.ts -t "test name pattern"`.
 
 ## Project layout
 
@@ -46,13 +40,16 @@ src/
   app/        # Next.js App Router pages, layouts, route handlers
   lib/        # Shared utilities (cn helper, patterns.ts, etc.)
   components/ # UI primitives (add via `pnpm dlx shadcn@latest add <name>`)
-e2e/                  # Playwright tests
-public/               # Static assets served at /
+e2e/          # Playwright tests
+public/       # Static assets served at /
+
+# Excluded from the Vercel build, not importable from src/, and Prettier-ignored (see Hard rules):
 agent-orchestration/  # Agent execution layer: project-overview, agent-protocol, phase docs, task files, dev-guide, ADRs
 docs/                 # Stakeholder + one-off: for-kristin/, notes/, website-outline.md, parallel-claude-sessions.md
-scripts/              # Migration + tooling scripts. Own package.json.
-content/              # Extracted legacy WP content. Input to migration; not served at runtime; vercelignored.
-demo/                 # Original styled redesign pitch — design reference; vercelignored.
+scripts/              # Migration + tooling scripts; own package.json
+content/              # Extracted legacy WordPress content; input to migration, not served at runtime
+demo/                 # Original styled redesign pitch — design reference
+.agents/              # Installed agent skills (supabase, supabase-postgres-best-practices)
 ```
 
 ## Tech stack
@@ -68,25 +65,13 @@ demo/                 # Original styled redesign pitch — design reference; ver
 
 ## Hard rules
 
-Apply on every task regardless of dev-guide section relevance:
+Apply on every task:
 
 - **Run `pnpm check` locally before every `git push`.** Mirrors CI; passing locally avoids the failure-then-hotfix loop.
-- **All colors flow through Tailwind tokens.** No hex/rgb literals, no inline `style={{ color: ... }}`. See [dev-guide § Design tokens & styling](./agent-orchestration/dev-guide.md).
 - **No imports into `src/` from `content/`, `scripts/`, `docs/`, `agent-orchestration/`, `demo/`, or `.agents/`.** All are `.vercelignore`'d — the production build fails. See [dev-guide § Import boundaries](./agent-orchestration/dev-guide.md).
-- **Secrets:** `.env.local` is git-ignored. The Supabase secret key (`sb_secret_...`) lives only there — never in Vercel, never prefixed `NEXT_PUBLIC_`. The publishable key (`sb_publishable_...`) is client-safe and goes in Vercel.
 
 ## ADR workflow
 
-ADRs in [`agent-orchestration/decisions/`](./agent-orchestration/decisions/) are immutable once Accepted. To change a decision, add `### Amendment YYYY-MM-DD — <title>` at the bottom of the ADR plus italic forward pointers from each affected section. Always read the bottom of an ADR before quoting it.
+Each ADR in [`agent-orchestration/decisions/`](./agent-orchestration/decisions/) reads as the **current** decision — no amendment log, no superseding files. When a decision changes, edit the ADR in place so it states the new truth; the prior version lives in git history. Changing a decision is **Kevin's call** — an agent edits an ADR only to reflect a decision Kevin has approved, never to change one unilaterally (per [`agent-protocol.md`](./agent-orchestration/agent-protocol.md)'s escalation rule).
 
 When to write an ADR vs. a dev-guide entry: if reversing the decision touches many files and rewrites other decisions → ADR; otherwise dev-guide (add the section in the same PR per dev-guide's authoring rule). Delineation in [`agent-orchestration/decisions/README.md`](./agent-orchestration/decisions/README.md).
-
-## Supabase tooling
-
-Skills installed at `.agents/skills/supabase` and `.agents/skills/supabase-postgres-best-practices`. Invoke before first Supabase API use per session — they capture RLS gotchas (Storage upsert needs INSERT + SELECT + UPDATE; views bypass RLS unless `security_invoker = true`; `TO authenticated` alone is BOLA/IDOR) absent from training data.
-
-Use Supabase MCP `execute_sql` for iterative schema work, `apply_migration` to commit stable changes, `get_advisors` after DDL. No Storage MCP tools — bucket creation is via SQL (`storage.buckets` is a regular table); uploads via local Node scripts using `@supabase/supabase-js`.
-
-## Tool ignore-list scope
-
-Prettier ignores `docs/`, `agent-orchestration/`, `demo/`, `content/`, `scripts/`, `.agents/`. ESLint runs across `src/` and `e2e/`.

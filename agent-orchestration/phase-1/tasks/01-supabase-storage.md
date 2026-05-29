@@ -25,7 +25,7 @@ Stand up the Supabase project + `site-images` bucket and migrate all non-pattern
 
 ## Scope (out)
 
-- Pattern images — deferred to task `04-patterns-catalog` per [ADR-0017 Amendment 2026-05-22](../../decisions/0017-content-modeling-patterns-catalog.md).
+- Pattern images — deferred to task `04-patterns-catalog` per [ADR-0017](../../decisions/0017-content-modeling-patterns-catalog.md).
 - Admin upload UI — Phase 2.
 - Database schema, auth — Phase 2.
 
@@ -46,4 +46,4 @@ Stand up the Supabase project + `site-images` bucket and migrate all non-pattern
 
 Shipped 2026-05-22. Supabase project `allen-kenoyer-glass` (ref `lgbeihhbkwnxykaaebbj`) created under the 10xDev org in `us-west-1` paired with Vercel's `sfo1` per [ADR-0002](../../decisions/0002-hosting-platform.md). `site-images` public-read bucket created via SQL migration (`create_site_images_bucket_and_rls`, then `restrict_site_images_select_to_authenticated`); RLS on `storage.objects` grants the `authenticated` role INSERT + SELECT + UPDATE + DELETE scoped by `bucket_id = 'site-images'` — needed because Postgres RLS requires SELECT for UPDATE/DELETE rows to be visible, even though anon reads happen via the bucket's public CDN path (`bucket.public = true`). 117 images migrated from `content/<slug>/images/` to `site-images/<slug>/<filename>` via `scripts/migrate-images.mjs` (run via `pnpm migrate:images`); patterns deliberately excluded per [ADR-0017](../../decisions/0017-content-modeling-patterns-catalog.md). `@supabase/supabase-js@2.106.1` installed as a production dep. `next.config.ts` derives the Supabase hostname from `NEXT_PUBLIC_SUPABASE_URL` at build time and configures `images.remotePatterns` to `/storage/v1/object/public/site-images/**`. Two `NEXT_PUBLIC_*` env vars set in Vercel (preview + production); `SUPABASE_SECRET_KEY` (modern replacement for the legacy `service_role` JWT) lives only in local `.env.local` for the migration script. One advisory accepted: `public_bucket_allows_listing` WARN — listing is exposed to `authenticated` only, which in this app means admin users (Kristin) per [ADR-0006](../../decisions/0006-authentication.md)'s invite-only auth; SELECT cannot be dropped without breaking future admin UPDATE/DELETE workflows.
 
-Post-shipment note (2026-05-22): [ADR-0017 Amendment 2026-05-22](../../decisions/0017-content-modeling-patterns-catalog.md) reversed the pattern-exclusion above. Patterns no longer go in `/public/`; they migrate to the same `site-images` bucket under `patterns/<category>/` during task `04-patterns-catalog`, reusing this script's pattern.
+Post-shipment note (2026-05-22): [ADR-0017](../../decisions/0017-content-modeling-patterns-catalog.md) was updated to reverse the pattern-exclusion above. Patterns no longer go in `/public/`; they migrate to the same `site-images` bucket under `patterns/<category>/` during task `04-patterns-catalog`, reusing this script's pattern.

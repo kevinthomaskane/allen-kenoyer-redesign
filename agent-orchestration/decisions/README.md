@@ -5,15 +5,14 @@ This directory contains Architecture Decision Records (ADRs) for the Allen Kenoy
 ## How this log works
 
 - One decision per file. Numbered sequentially in the order they are **decided** (not the order they are proposed).
-- Decisions are immutable once accepted. If we change our mind, write a new ADR that supersedes the old one, and update the old one's status.
+- An ADR always reflects the **current** decision. When a decision changes, edit the ADR in place so it states the new truth — no amendment sections, no superseding files; the prior version lives in git history. Changing a decision is Kevin's call (see [`../agent-protocol.md`](../agent-protocol.md)'s escalation rule).
 - Use [`TEMPLATE.md`](./TEMPLATE.md) as the starting point for any new ADR.
 
 ## Status legend
 
 - **Pending** — On the roadmap, not yet discussed
 - **In Discussion** — Actively being decided
-- **Accepted** — Decision locked in
-- **Superseded by ADR-####** — Replaced by a later decision
+- **Accepted** — Decision is in effect (edited in place if it later changes)
 - **Deprecated** — No longer relevant
 
 ## Decision index

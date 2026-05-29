@@ -30,7 +30,7 @@ Constraints that apply:
 
 ### Image storage
 
-- **Static in `/public/patterns/[category]/...`.** Build-time optimization via `next/image`. No DB, no API call, no runtime dependency. *See "Amendment 2026-05-22 — Pattern image storage moves to Supabase Storage" below — this option was originally chosen, then reversed.*
+- **Static in `/public/patterns/[category]/...`.** Build-time optimization via `next/image`. No DB, no API call, no runtime dependency.
 - **Supabase Storage** (consistent with [ADR-0007](./0007-image-pipeline-and-storage.md) for admin-uploaded images). Adds a network hop and migration ceremony for content that never changes outside commits.
 - **Static + pre-generated variants at build time.** Faster first paint, more build complexity.
 
@@ -41,7 +41,7 @@ The minimum is image + a unique identifier. Beyond that:
 - **Name** — short human-readable label. Current site shows numbers only.
 - **Dimensions** — useful for fitment, would require authoring across 165 records.
 - **Description** — 1–2 sentences each, also authoring overhead.
-- **Price** — current site doesn't publish prices; this would be new for the rebuild. *See "Amendment 2026-05-22" below — this premise was incorrect.*
+- **Price** — the existing site already publishes prices on its category pages; the rebuild preserves them, informational only.
 
 ### Detail pages vs grid-only
 
@@ -71,7 +71,7 @@ The minimum is image + a unique identifier. Beyond that:
 
 ### Storage
 
-A single TypeScript module — `lib/patterns.ts` — exports a typed array of all pattern records. Adding a pattern is a code change: drop the image file into `/public/patterns/[category]/`, then append the matching record to the array. *See "Amendment 2026-05-22 — Pattern image storage moves to Supabase Storage" below — the image-drop workflow is replaced by a Supabase Storage upload.* The TypeScript type acts as the schema:
+A single TypeScript module — `lib/patterns.ts` — exports a typed array of all pattern records. Adding a pattern is a code change: upload the image to the `site-images` Supabase Storage bucket under `patterns/[category]/` (reusing the Phase 1 migration-script pattern), then append the matching record to the array. The TypeScript type acts as the schema:
 
 ```ts
 type PatternCategory =
@@ -84,16 +84,16 @@ type Pattern = {
   number: string;            // e.g., "102C", "105", "14903"
   category: PatternCategory;
   price: number;             // USD, informational only
-  image: string;             // filename relative to /public/patterns/[category]/
+  image: string;             // source filename; resolved to site-images/patterns/[category]/<image> at render time
   alt?: string;              // optional alt text override
 };
 ```
 
-`number` is a string, not an integer — the existing catalog uses alphanumeric numbers (`102C`, `103C`, etc.) that don't fit an integer type. Uniqueness is enforced at the catalog level, not just per-category, but the public site exposes patterns within their category page. *See "Amendment 2026-05-26 — Uniqueness is (category, number), not catalog-wide" below — the catalog-wide uniqueness claim is reversed; uniqueness is per-category.*
+`number` is a string, not an integer — the existing catalog uses alphanumeric numbers (`102C`, `103C`, etc.) that don't fit an integer type. Uniqueness is the composite `(category, number)`: a bare `number` is unique within its category but not across the catalog — five numbers (`#105`, `#109`, `#111`, `#789`, `#805`) appear in two categories each as distinct designs, sometimes at different prices (e.g., `#105` is $6.00 in Beginner, $8.00 in Mirrors & Frames). The public site exposes patterns within their category page, so a customer sees a given number once per browsing context. Catalog-construction assertions in `lib/patterns.ts` check `(category, number)` uniqueness.
 
 ### Image storage
 
-Pattern images live as static assets under `/public/patterns/[category]/`. `next/image` handles responsive sizing and format optimization at build/request time. Extensions are preserved from the source files (mix of `.gif` and `.jpg` is acceptable; `next/image` re-encodes for delivery). No Supabase Storage involvement for the patterns catalog. *See "Amendment 2026-05-22 — Pattern image storage moves to Supabase Storage" below — this section's storage location was reversed; patterns now live in Supabase Storage like the rest of the site's images.*
+Pattern images live in Supabase Storage — the `site-images` bucket, path `patterns/[category]/<filename>` — alongside the rest of the site's images, consistent with [ADR-0007](./0007-image-pipeline-and-storage.md)'s "all site images in one bucket, subfolders by content type" model. `next/image` fetches them via the `images.remotePatterns` config in `next.config.ts` and handles responsive sizing and format optimization. Extensions are preserved from the source files (mix of `.gif` and `.jpg` is acceptable; `next/image` re-encodes for delivery).
 
 ### Browsing UX
 
@@ -122,9 +122,9 @@ No technical protection. Images are served at the resolution needed for confiden
 ## Rationale
 
 - **A single TypeScript module beats per-file or per-category alternatives at this scale.** 165 records of 4–5 fields each fit comfortably in one well-formatted file (~1000 lines). A single import target, full type-checking on every record, and trivial filtering/grouping at consumption time. Per-pattern markdown files would be 165 nearly-empty files with no body content — pure ceremony.
-- **Static images in `/public/` are right for this content type.** Patterns never change at runtime, there's no admin upload flow, and `next/image` already optimizes static assets in `/public/` the same way it would Supabase-hosted images. Adding Supabase Storage as a hop would slow first paint without buying anything — the admin convenience [ADR-0007](./0007-image-pipeline-and-storage.md) is built for doesn't apply when the content is dev-managed. *See "Amendment 2026-05-22 — Pattern image storage moves to Supabase Storage" below — this rationale no longer applies; consistency with ADR-0007's "all site images in one bucket" model now dominates.*
+- **Pattern images live in Supabase Storage, like the rest of the site.** Keeping patterns in `/public/` while every other image lives in Supabase Storage ([ADR-0007](./0007-image-pipeline-and-storage.md)) would add a special case for no compelling reason. The performance argument is thin — `next/image` optimizes equally from both sources — so the simpler mental model, "all site images live in Supabase Storage," wins. Patterns remain dev-managed; only the storage location is shared, not the editing workflow.
 - **Alphanumeric `number` string** is required by the existing data; the rebuild preserves the studio's existing pattern numbering rather than re-numbering 165 records.
-- **Price field is new** but stays informational. Customers historically called or emailed to ask about prices; surfacing the price on the catalog page removes friction without crossing into e-commerce (no cart, no checkout, no payment). *See "Amendment 2026-05-22" below — the "new" framing was incorrect; the field is preserved from the existing site, not introduced.*
+- **Price field is preserved from the existing site** and stays informational. The current site already publishes prices on its category pages; surfacing the price removes friction without crossing into e-commerce (no cart, no checkout, no payment).
 - **Grid + lightbox** matches how stained glass pattern catalogs are actually used — visual scanning, comparing several at once, zooming into the ones that catch the eye. Detail pages would mean clicking back-and-forth between near-empty pages for a view the lightbox already provides.
 - **No per-pattern CTA in the lightbox** because the studio's ordering flow is conversational ("call us and tell us which numbers you want") — a customer often orders several patterns in one inquiry, and surfacing a single-pattern button would push them toward less efficient single-pattern emails.
 - **Numeric-aware sort by `number` ascending** matches how customers think about the catalog ("show me #105 through #110") and keeps adjacent variants (`102C` and `103C`) near each other.
@@ -138,59 +138,14 @@ No technical protection. Images are served at the resolution needed for confiden
 - **No name, dimensions, or description.** The catalog stays sparse. Customers who want details ask the studio. This matches the existing flow and avoids the authoring burden of writing 165 entries' worth of metadata.
 - **Mixed image extensions (`.gif` + `.jpg`).** Acceptable because `next/image` re-encodes images for delivery; the source format doesn't affect output. The `image` field preserves the source extension to avoid surprise breakage during migration.
 - **No technical copyright protection.** Images can be saved by any visitor with browser tools. Acceptable; the studio's risk profile is small (most casual visitors aren't pirating stained glass patterns) and legal recourse remains intact.
-- **Price field on a non-commerce site** could lead a visitor to expect online ordering. The catalog page and lightbox must phrase ordering instructions clearly — "Order by phone or email, reference pattern numbers" — to avoid confusion. *See "Amendment 2026-05-22" below — the underlying concern still applies, but the risk isn't new with the rebuild; the live site already publishes prices alongside conversational ordering.*
+- **Price field on a non-commerce site** could lead a visitor to expect online ordering. The catalog page and lightbox must phrase ordering instructions clearly — "Order by phone or email, reference pattern numbers" — to avoid confusion. Not a new risk: the live site already publishes prices alongside conversational ordering.
 
 ## Related decisions
 
-- Depends on: [ADR-0004](./0004-admin-dashboard-architecture.md) (designates patterns as developer-managed, not admin), [ADR-0001](./0001-frontend-framework.md) (Next.js + `next/image` enable the static-asset pipeline).
-- Does *not* depend on: [ADR-0005](./0005-database-and-query-layer.md) (no DB involvement), [ADR-0007](./0007-image-pipeline-and-storage.md) (no Supabase Storage involvement for patterns).
+- Depends on: [ADR-0004](./0004-admin-dashboard-architecture.md) (designates patterns as developer-managed, not admin), [ADR-0001](./0001-frontend-framework.md) (Next.js + `next/image`), [ADR-0007](./0007-image-pipeline-and-storage.md) (pattern images live in the `site-images` Supabase Storage bucket).
+- Does *not* depend on: [ADR-0005](./0005-database-and-query-layer.md) (no DB involvement; the catalog is a dev-managed TS module, not a table).
 - Influences: URL redirect & migration strategy (next ADR; the live site uses `/patterns/[category]` but the rebuild puts them at `/supplies/patterns/[category]`), SEO & schema markup (later ADR; consider whether `CreativeWork` markup is worthwhile on individual patterns given no detail page).
 
-## Amendment 2026-05-22 — Price field preserved from existing site, not new
+## Source-data note — pattern numbering
 
-The original ADR characterized the `price` field as net-new for the rebuild, based on the live-site inspection at authoring time. That premise was incorrect. The extracted content under `content/supplies/patterns/<category>/content.md` already includes prices for the catalog, formatted as alternating `#<number>` / `$<price>` blocks (e.g., `#102C` → `$6.00`, `#121` → `$10.00`). The rebuild is *preserving* an existing field, not introducing one.
-
-The decision itself stands unchanged: `price: number` remains a required field on the `Pattern` type, surfaced in the lightbox alongside the image and number. The framing that shifts:
-
-- **Options considered → Per-pattern fields** — "current site doesn't publish prices" is false. The current site does publish prices on its category pages.
-- **Rationale → "Price field is new"** — should read "Price field is preserved from the existing site." The "informational, not transactional" framing is still correct.
-- **Tradeoffs accepted → "Price field on a non-commerce site could lead a visitor to expect online ordering"** — concern still applies; clear ordering instructions in the lightbox + landing page remain important. What's not true is that the rebuild introduces this risk — the live site already navigates exactly this combination (prices published + conversational ordering).
-
-Authoring source for [Phase 1 Chunk D](../implementation-plan.md#phase-1--public-marketing-site): pattern numbers and prices are both parsed from `content/supplies/patterns/<category>/content.md` to populate the `lib/patterns.ts` records.
-
-## Amendment 2026-05-22 — Pattern image storage moves to Supabase Storage
-
-The original ADR placed pattern images at `/public/patterns/[category]/` and explicitly excluded them from Supabase Storage. That decision is reversed: pattern images now live in Supabase Storage alongside the rest of the site's images, restoring full alignment with [ADR-0007](./0007-image-pipeline-and-storage.md)'s "all site images in one bucket, subfolders by content type" model.
-
-**What changes:**
-
-- **Image storage location:** `/public/patterns/[category]/` → Supabase Storage `site-images` bucket, path `patterns/[category]/<filename>`. `next/image` fetches via the existing `images.remotePatterns` config in `next.config.ts` (per [ADR-0007](./0007-image-pipeline-and-storage.md), already set up in Phase 1 Chunk A).
-- **Authoring workflow:** Adding a pattern is still a code change, but the "drop image into `/public/`" step becomes "upload image to the Supabase Storage bucket" (reuse the same migration-script pattern Phase 1 Chunk A uses for the rest of the site's content images). The `lib/patterns.ts` record's `image` field references the bucket path (or the bare filename, with the bucket prefix applied at render time — an implementation detail for Chunk D).
-- **Rationale shifts:** The original ADR's argument that "static images in `/public/` are right for this content type" no longer applies. The new rationale is consistency: having patterns in one storage location and the rest of the site's images in another adds a special case for no compelling reason. The performance argument was always thin — `next/image` optimizes equally from both sources — and the simpler mental model ("all site images live in Supabase Storage") wins.
-
-**What does not change:**
-
-- The `Pattern` type shape — `number`, `category`, `price`, `image`, optional `alt` are all preserved.
-- `lib/patterns.ts` remains the dev-managed catalog source; only the `image` field's resolved location changes.
-- Sort order (natural-numeric `number` ascending), lightbox UX, "no per-pattern URL", copyright posture — all unchanged.
-- Mixed `.gif` / `.jpg` extensions preserved through migration; `next/image` re-encodes for delivery regardless.
-
-**Implementation note for [Phase 1 Chunk D](../implementation-plan.md#phase-1--public-marketing-site):** pattern images migrate into Supabase Storage during Chunk D, mirroring Chunk A's content-image migration approach. The plan is updated accordingly.
-
-## Amendment 2026-05-26 — Uniqueness is (category, number), not catalog-wide
-
-The original ADR stated that pattern `number` is unique catalog-wide. Inspection of the extracted source data during [Phase 1 Chunk D](../implementation-plan.md#phase-1--public-marketing-site) authoring shows otherwise: five numbers appear in two categories each — `#105`, `#109`, `#111` in both Beginner and Mirrors & Frames, plus `#789` and `#805` in both Beginner and Intermediate. They are distinct designs, and several carry different prices across categories (e.g., `#105` is $6.00 Beginner / $8.00 Mirrors & Frames). The live site has shipped this way for years; the rebuild matches that reality rather than re-numbering.
-
-**What changes:**
-
-- **Uniqueness model:** the composite key `(category, number)` is unique within the catalog. A bare `number` is unique within its category but not across categories.
-- **Type:** `Pattern.number: string` is preserved; the type doesn't carry the category as a discriminant beyond the existing `category` field. Catalog-construction assertions in `lib/patterns.ts` check `(category, number)` uniqueness, not bare-`number` uniqueness.
-- **Public UX:** unchanged. Each category page already exists at its own route (`/supplies/patterns/[category]`) and lists only its own patterns, so a customer sees `#105` exactly once within any given browsing context. The lightbox shows number + price + image; the URL exposes the category, and the displayed number is short and ordering-friendly.
-
-**What does not change:**
-
-- The `Pattern` type shape — `number`, `category`, `price`, `image`, optional `alt` — and the dev-managed single-module `lib/patterns.ts` storage decision.
-- Sort order (natural-numeric `number` ascending), grid + lightbox UX, "no per-pattern URL", copyright posture.
-- Customer ordering vocabulary — patterns are still referenced by the bare number when ordering by phone or email. The studio's existing flow already disambiguates by category in conversation when needed.
-
-**Implementation note:** [Phase 1 Chunk D](../implementation-plan.md#phase-1--public-marketing-site) authoring uses the source content.md files (`content/supplies/patterns/<category>/content.md`) directly. Pattern numbers/prices are aligned positionally with the `## Images` filename list in the same file (which preserves the source's `<category>-<number>.<ext>` filename convention, including the `02` suffix the source CMS appended to filenames whose numeric stem already existed elsewhere — e.g., `intermediate-78902.gif` is `#789` in the Intermediate category, distinct from `beginner-789.gif`).
+Pattern numbers and prices are authored from the source content (`content/supplies/patterns/<category>/content.md`), where they appear as alternating `#<number>` / `$<price>` blocks aligned positionally with the `## Images` filename list. The source's `<category>-<number>.<ext>` filename convention is preserved on disk — including the `02` suffix the source CMS appended when a numeric stem already existed elsewhere (e.g., `intermediate-78902.gif` is `#789` in Intermediate, distinct from `beginner-789.gif`).

@@ -1,6 +1,6 @@
 # ADR-NNNN: {Decision title — one short noun phrase, e.g. "Frontend framework"}
 
-- **Status:** {Pending | In Discussion | Accepted | Superseded by ADR-#### | Deprecated}
+- **Status:** {Pending | In Discussion | Accepted | Deprecated}
 - **Date:** {YYYY-MM-DD when accepted}
 - **Deciders:** {names}
 
@@ -37,4 +37,3 @@ What are we giving up by making this choice? What problems are we deferring? Wha
 
 - Depends on: ADR-####
 - Influences: ADR-####
-- Supersedes: ADR-#### (if applicable)

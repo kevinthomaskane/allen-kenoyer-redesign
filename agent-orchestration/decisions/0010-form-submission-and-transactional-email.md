@@ -8,7 +8,7 @@
 
 Two distinct outbound-email needs in this project share infrastructure:
 
-1. **Public form submissions** — contact form, custom-design inquiry, repair inquiry, newsletter signup. All deliver a notification email to the studio inbox. *See "Amendment 2026-05-22 — Newsletter signup carved out per ADR-0011" below — newsletter signup is excluded from this ADR's scope and bypasses the Server Actions + Resend pipeline entirely.*
+1. **Public form submissions** — contact form, custom-design inquiry, repair inquiry. All deliver a notification email to the studio inbox. (Newsletter signup is **not** one of these — it is carved out to Constant Contact per [ADR-0011](./0011-newsletter-esp-integration.md); see the Decision section.)
 2. **Supabase Auth transactional emails** — invite email when seeding an admin user, password reset emails for [ADR-0006](./0006-authentication.md). These exist regardless of public-form decisions; Supabase's default SMTP is rate-limited and not suitable for production.
 
 Because both use cases need the same transactional email service, we bundle them in one ADR.
@@ -47,6 +47,8 @@ Three bundled calls:
 
 **Spam protection:** Honeypot field + server-side rate limiting per IP on public form Server Actions. Specific implementation (Vercel Edge Config, Upstash, etc.) is dev-guide level; this ADR records only that the protection layer exists.
 
+**Newsletter signup is carved out.** It is the only public form that does *not* use this pipeline: newsletter signup is a link/embed to Constant Contact's hosted opt-in page per [ADR-0011](./0011-newsletter-esp-integration.md), bypassing this site's backend entirely — no Server Action, no Resend send, no honeypot, no rate limit. All other public forms (contact, custom-design inquiry, repair inquiry) use the Server Actions + Resend pipeline as decided here. The decision's spirit — one pipeline, one provider, one DKIM setup — survives the exception: Constant Contact handles its own deliverability, Resend handles everything else.
+
 ## Rationale
 
 - **Server Actions + Resend** is the conventional pattern in this stack. The form submission validates against the same Zod schema the client form uses ([ADR-0009](./0009-forms-and-validation.md)), and the email service is incrementally free because we needed one for Supabase Auth regardless.
@@ -66,14 +68,5 @@ Three bundled calls:
 
 - Depends on: [ADR-0001](./0001-frontend-framework.md) (Server Actions are an App Router primitive), [ADR-0006](./0006-authentication.md) (Supabase Auth uses this provider for outbound mail), [ADR-0009](./0009-forms-and-validation.md) (Server Action handlers validate against the form's Zod schema).
 - Influences: Spam-protection implementation (dev guide).
-- Carved out by: [ADR-0011](./0011-newsletter-esp-integration.md) — newsletter signup bypasses this ADR's pipeline entirely; it's a link/embed to Constant Contact's hosted opt-in page. See Amendment 2026-05-22 below.
+- Carved out by: [ADR-0011](./0011-newsletter-esp-integration.md) — newsletter signup bypasses this ADR's pipeline entirely; it's a link/embed to Constant Contact's hosted opt-in page.
 
-## Amendment 2026-05-22 — Newsletter signup carved out per ADR-0011
-
-The original ADR included newsletter signup in its list of public forms (Context § 1) and decided that all public-form submissions go through Server Actions + Resend (Decision § 1). [ADR-0011](./0011-newsletter-esp-integration.md) (Accepted 2026-05-20) carved newsletter signup out of that pipeline: newsletter signup is a link or embed pointing at Constant Contact's existing hosted opt-in page, bypassing this site's backend entirely. No Server Action, no Resend send, no honeypot, no rate limit — Constant Contact handles the whole flow.
-
-This is the **only public form on the site that does not follow this ADR's pattern.** All other public forms (contact, custom-design inquiry, repair inquiry) remain in scope and use the Server Actions + Resend pipeline as decided here.
-
-The original ADR's "Influences" line ("[ADR-0011 pending]") was a forward-looking hedge that's now settled. The "Related decisions" section is updated to reflect the carve-out cleanly: ADR-0011 is recorded as a carve-out, not an influence.
-
-The decision's *spirit* — "one pipeline, one provider, one DKIM setup" — survives the exception cleanly. Constant Contact handles its own deliverability for newsletter signups; Resend handles everything else.

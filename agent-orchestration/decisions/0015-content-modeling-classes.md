@@ -63,8 +63,9 @@ Variation on either A or C that stores sessions as a JSONB array on the parent r
 |---|---|---|
 | `id` | uuid (PK) | |
 | `class_id` | uuid (FK → `classes.id`) | |
-| `label` | text | Short identifier — "Tuesday evenings", "Spring 2026". Used to distinguish concurrent cohorts on the public page. |
-| `enrollment_count` | integer (nullable) | Admin-only planning aid. Never displayed publicly. |
+| `kind` | enum (`'multi_session' \| 'single_session'`) | Set on insert from the admin's entry-point choice ([ADR-0021](./0021-admin-class-workflow-ux.md)); immutable thereafter. The public-site renderer branches on this column. |
+| `label` | text (nullable) | Short identifier — "Tuesday evenings", "Spring 2026". Required for `kind = 'multi_session'` (distinguishes concurrent runs); optional/auto-generated for `kind = 'single_session'`, where the session date already disambiguates. |
+| `enrollment_count` | integer (nullable) | Admin-only planning aid. The count value is never displayed publicly; its derived sold-out state is — when `enrollment_count >= class.max_students`, [ADR-0020](./0020-google-calendar-integration.md)'s sync prefixes the cohort's Google Calendar events with `[SOLD OUT]`. |
 | `published` | boolean | Independent of `class.published`. Lets Kristin draft a cohort before announcing it. |
 | `created_at`, `updated_at` | timestamptz | |
 
@@ -76,6 +77,9 @@ Variation on either A or C that stores sessions as a JSONB array on the parent r
 | `cohort_id` | uuid (FK → `cohorts.id`) | |
 | `starts_at` | timestamptz | |
 | `ends_at` | timestamptz | |
+| `gcal_event_id` | text (nullable) | ID returned by Google Calendar when an event is created for this session ([ADR-0020](./0020-google-calendar-integration.md)). Null until first synced (e.g., parent cohort still draft). |
+| `sync_status` | text (enum-checked: `synced` \| `pending` \| `failed`) | Per-row sync state; defaults to `pending` on insert. |
+| `sync_error` | text (nullable) | Last error from a failed push; cleared on successful sync. |
 | `created_at`, `updated_at` | timestamptz | |
 
 ### Public visibility rule
@@ -115,42 +119,7 @@ Slugs are auto-generated from `name` on every save (kebab-case, stripped of non-
 - **`fee_notes` is unstructured.** Strings like "+ glass at cost" can't be price-extracted for `Offer`/`Course` schema markup. Acceptable: the structured fees (tuition/supply/kit) cover the price portion of schema markup; `fee_notes` is human-readable supplemental text.
 - **`enrollment_count` is admin-trust.** No system enforces consistency between it and any external roster Kristin keeps. It's a planning aid, not a reservation system.
 - **No history of past cohorts as a feature.** Expired cohorts persist accidentally; if Kristin deletes them, that history is gone with no recovery. Acceptable because the project scope does not include analytics or historical reporting on classes.
-
-## Amendment 2026-05-22 — Schema additions for Google Calendar integration
-
-Per [ADR-0020](./0020-google-calendar-integration.md), integrating class data with Kristin's public Google Calendar requires three additive columns and one column relaxation against this ADR's schema. The amendment is non-breaking; existing rows take the new defaults / null values cleanly.
-
-**`cohort_sessions`** — three new columns:
-
-| Field | Type | Notes |
-|---|---|---|
-| `gcal_event_id` | text (nullable) | The ID returned by Google Calendar when an event is created for this session. Null when the session has never been synced (e.g., parent cohort is draft). |
-| `sync_status` | text (enum-checked: `synced` \| `pending` \| `failed`) | Per-row sync state. Defaults to `pending` on insert. |
-| `sync_error` | text (nullable) | Last error message from a failed push. Cleared on successful sync. |
-
-**`cohorts.label`** — type unchanged, `NOT NULL` constraint dropped:
-
-| Field | Change | Notes |
-|---|---|---|
-| `label` | required → optional | Required for multi-session cohorts (used to distinguish concurrent runs); optional for one-off single-session cohorts where the session date already disambiguates. The public visibility rule and admin views are unchanged. |
-
-**Rationale note on `enrollment_count`.** This ADR's original framing — *"admin-only planning aid. Never displayed publicly"* — remains true for the value itself. The sold-out title prefix introduced by [ADR-0020](./0020-google-calendar-integration.md) does, however, make `enrollment_count`'s *consequences* public: when `enrollment_count >= max_students`, every Google Calendar event for the affected cohort is prefixed `[SOLD OUT]`. The count number is still never displayed; the derived sold-out state is.
-
-## Amendment 2026-05-26 — Cohort kind column
-
-Per [ADR-0021](./0021-admin-class-workflow-ux.md), the admin UI surfaces two distinct cohort creation flows ("New cohort" for multi-session courses, "New single session" for one-off workshops), and the public site renders the two kinds with different card layouts. A reliable column-level signal is needed so the renderer doesn't have to derive intent from session count.
-
-**`cohorts`** — one new column:
-
-| Field | Type | Notes |
-|---|---|---|
-| `kind` | enum (`'multi_session' \| 'single_session'`) | Set on insert based on the admin's entry-point choice; immutable thereafter. The public site renderer branches on this column. |
-
-**Field semantics revised by this amendment:**
-
-- `label` semantics narrow: required for `kind = 'multi_session'`, optional/auto-generated for `kind = 'single_session'` (single-session workshops do not need a human-meaningful cohort label; the date and time serve as identification). [ADR-0020](./0020-google-calendar-integration.md)'s 2026-05-22 amendment already dropped the database-level `NOT NULL` constraint on `label`; this amendment adds the `kind`-conditional rule that the admin and renderer enforce on top of that constraint relaxation.
-
-**Tradeoff:** Converting a single-session workshop into a multi-session cohort (or vice versa) requires deleting and recreating the cohort, since `kind` is immutable. Acceptable; conversion would be rare and the data model treats them as distinct kinds.
+- **`cohort.kind` is immutable.** Converting a single-session workshop into a multi-session cohort (or vice versa) means deleting and recreating the cohort. Acceptable; conversion would be rare and the model treats the two kinds as distinct.
 
 ## Related decisions
 

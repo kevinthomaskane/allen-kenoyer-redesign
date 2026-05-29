@@ -8,7 +8,7 @@
 
 The website rebuild outline ([`website-outline.md`](../website-outline.md)) initially framed `/classes/calendar` as a custom calendar replacing the Google Calendar embed — "no more dual tracking." After follow-up conversation with Kristin (the studio manager), she explicitly wants to keep her public Google Calendar. The site's own class listing remains independent (driven by [ADR-0015](./0015-content-modeling-classes.md)), but the admin must keep her Google Calendar in sync as a side-effect of class management, so she does not have to enter the same dates twice.
 
-This ADR specifies *how* that backend integration works: direction, granularity, authentication, event content, failure handling, and operational rollout. It also records small additive amendments to [ADR-0015](./0015-content-modeling-classes.md)'s schema that this integration requires.
+This ADR specifies *how* that backend integration works: direction, granularity, authentication, event content, failure handling, and operational rollout. It also specifies the schema columns on [ADR-0015](./0015-content-modeling-classes.md) that this integration requires.
 
 Constraints that apply:
 
@@ -65,21 +65,9 @@ This ADR bundles six calls:
 5. **Failure handling:** DB-wins. New columns `sync_status` and `sync_error` on `cohort_sessions`. Retries are idempotent — a retry GETs the event by stored `gcal_event_id` before deciding to create vs. update.
 6. **Backfill:** "Sync all" is a permanent admin feature, not a one-off script. Run once at launch against seeded data; available thereafter as the recovery tool when state drifts.
 
-### Schema additions (additive amendment to [ADR-0015](./0015-content-modeling-classes.md))
+### Schema requirements
 
-**`cohort_sessions`** — three new columns:
-
-| Field | Type | Notes |
-|---|---|---|
-| `gcal_event_id` | text (nullable) | The ID returned by GCal when the event is created. Null when the session has never been synced (e.g., parent cohort is draft). |
-| `sync_status` | text (enum-checked) | `synced` \| `pending` \| `failed`. Defaults to `pending` on insert. |
-| `sync_error` | text (nullable) | Last error message from a failed push. Cleared on successful sync. |
-
-**`cohorts`** — one column relaxed:
-
-| Field | Change | Notes |
-|---|---|---|
-| `label` | text → text (nullable) | Required for multi-session cohorts (used to distinguish concurrent runs); optional for one-off single-session cohorts where the session date already disambiguates. |
+This integration drives three columns on `cohort_sessions` — `gcal_event_id` (the GCal event ID, null until first synced), `sync_status` (`synced` \| `pending` \| `failed`, defaults to `pending`), and `sync_error` (last failure message) — and requires `cohorts.label` to be nullable (required for multi-session cohorts, optional for single-session, where the session date disambiguates). These columns are part of [ADR-0015](./0015-content-modeling-classes.md)'s class schema; this ADR is the reason they exist.
 
 ### Event content specification
 
@@ -160,7 +148,7 @@ The sold-out marker introduced here gives `cohort.enrollment_count` public-facin
 
 ## Tradeoffs accepted
 
-- **`enrollment_count`'s no-longer-strictly-admin-only consequences.** [ADR-0015](./0015-content-modeling-classes.md) was explicit that the count is "admin-only planning aid. Never displayed publicly." The sold-out marker doesn't display the count itself, but it makes its consequences public. A brief amendment block in [ADR-0015](./0015-content-modeling-classes.md) should record this so future readers do not get a wrong picture. The integrity of "the number is private" is preserved; the integrity of "the count has no public effect" is not.
+- **`enrollment_count`'s no-longer-strictly-admin-only consequences.** [ADR-0015](./0015-content-modeling-classes.md) was explicit that the count is "admin-only planning aid. Never displayed publicly." The sold-out marker doesn't display the count itself, but it makes its consequences public. [ADR-0015](./0015-content-modeling-classes.md) records this in its `enrollment_count` note so future readers do not get a wrong picture. The integrity of "the number is private" is preserved; the integrity of "the count has no public effect" is not.
 - **Service account-authored events on a personal Google account.** Standard GCal API behavior on non-Workspace calendars: events created by a non-owner ACL'd writer appear with the service account as the author when viewed in detail. Acceptable on a class calendar already branded with the studio's identity.
 - **One-time onboarding step.** Kristin must add the service account's email to her calendar's ACL in the Google Calendar UI ("Settings and sharing > Share with specific people > Add people and groups > role: Make changes to events"). One-time, ~30 seconds, well-documented in the onboarding brief — but it is a step she has to take.
 - **Drift windows under sync failure.** Between a failed GCal push and the user noticing the retry affordance, the DB and GCal disagree. Acceptable because the admin is the source of truth and the public site does not consult GCal — drift is only visible to people viewing her Google Calendar directly.
@@ -173,8 +161,4 @@ The sold-out marker introduced here gives `cohort.enrollment_count` public-facin
 
 - Depends on: [ADR-0004](./0004-admin-dashboard-architecture.md) (custom admin with Server Actions as the write surface), [ADR-0005](./0005-database-and-query-layer.md) (Supabase as the platform; new columns land via Supabase CLI migrations), [ADR-0015](./0015-content-modeling-classes.md) (the schema this amends).
 - Influences: Phase 2 of [`implementation-plan.md`](../implementation-plan.md) (GCal integration ships alongside the CMS rollout); future Phase 2 work on `/classes/[slug]` rendering (sold-out treatment on the public site).
-- Amends: [ADR-0015](./0015-content-modeling-classes.md) (additive — three new columns on `cohort_sessions`, `cohorts.label` relaxed to nullable, public-facing consequence of `enrollment_count` via sold-out marker).
-
-## Amendment landed in ADR-0015 on acceptance
-
-When this ADR moved from Proposed to Accepted on 2026-05-22, the schema amendment it specified was applied to [ADR-0015](./0015-content-modeling-classes.md) as `### Amendment 2026-05-22 — Schema additions for Google Calendar integration`. The amendment is non-breaking: three additive columns on `cohort_sessions` (`gcal_event_id`, `sync_status`, `sync_error`), `cohorts.label` relaxed from required to nullable, and a clarifying rationale note about `enrollment_count`'s now-public consequences via the sold-out title prefix. See ADR-0015 for the full amendment text.
+- Reflected in: [ADR-0015](./0015-content-modeling-classes.md)'s schema — the `gcal_event_id` / `sync_status` / `sync_error` columns on `cohort_sessions`, the nullable `cohorts.label`, and the `enrollment_count` sold-out note all exist because of this integration.
