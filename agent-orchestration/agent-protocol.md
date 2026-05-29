@@ -2,6 +2,8 @@
 
 The procedural document for working a task. Read this when you've been assigned a task; everything that follows is the contract you're expected to operate under.
 
+> To **create** a phase's tasks rather than execute an assigned one, see [`authoring-protocol.md`](./authoring-protocol.md).
+
 This protocol is paired with the orchestrator-assigned model: Kevin assigns each task to a specific session ("do task `01-admin-auth`"). Agents don't auto-claim from a queue. If you weren't assigned a task explicitly, you're not running this protocol — fall back to whatever the user actually asked for.
 
 ---

@@ -14,6 +14,9 @@ demand — pull each doc when its trigger fires:
 - **Making or citing a hard-to-reverse decision** →
   [`decisions/`](./agent-orchestration/decisions/), the ADR log. Each ADR reads
   as the current decision; changing one is Kevin's call, applied in place.
+- **Authoring tasks for a phase** ("create tasks for Phase 2") → read
+  [`authoring-protocol.md`](./agent-orchestration/authoring-protocol.md); it owns
+  the synthesize-README → slice → write-tasks flow and its per-stage gates.
 
 ## What this project is
 
