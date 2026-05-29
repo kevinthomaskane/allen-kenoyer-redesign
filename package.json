@@ -22,7 +22,8 @@
     "check:e2e": "pnpm check && pnpm test:e2e",
     "migrate:images": "node --env-file=.env.local scripts/migrate-images.mjs",
     "migrate:patterns": "node --env-file=.env.local scripts/migrate-pattern-images.mjs",
-    "gen:tracker": "node scripts/gen-tracker.mjs"
+    "gen:tracker": "node scripts/gen-tracker.mjs",
+    "prepare": "husky"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.106.1",
@@ -45,6 +46,7 @@
     "eslint": "9.39.4",
     "eslint-config-next": "16.2.6",
     "eslint-config-prettier": "10.1.8",
+    "husky": "9.1.7",
     "postcss": "8.5.15",
     "prettier": "3.8.3",
     "prettier-plugin-tailwindcss": "0.8.0",
