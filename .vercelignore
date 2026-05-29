@@ -2,3 +2,5 @@ content/
 scripts/
 docs/
 agent-orchestration/
+demo/
+.agents/
