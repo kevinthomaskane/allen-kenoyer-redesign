@@ -1,34 +1,22 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+Guidance for Claude Code when working with this repo. Substantive project context lives in [`agent-orchestration/project-overview.md`](./agent-orchestration/project-overview.md); per-task instructions in [`agent-orchestration/agent-protocol.md`](./agent-orchestration/agent-protocol.md); conventions in [`agent-orchestration/dev-guide.md`](./agent-orchestration/dev-guide.md).
 
 ## What this project is
 
-WordPress-to-custom rebuild for Allen Kenoyer Glass (Lawndale, CA stained glass studio). Public marketing site plus an authenticated admin/CMS surface for the studio manager (Kristin). **Locked scope:** no e-commerce, no online class registration, frontend is largely static, the admin dashboard is the one dynamic surface and the core feature of the project.
+WordPress-to-custom rebuild for **Allen Kenoyer Glass** (Lawndale, CA stained-glass studio). Public marketing site + authenticated admin/CMS for the studio manager (Kristin). **Locked scope:** no e-commerce, no online class registration. Frontend largely static; the admin dashboard is the one dynamic surface and the core feature.
 
-## Source-of-truth docs (read these before substantive work)
+## Working on an assigned task
 
-Project decisions are **ADR-first**. Implementation follows a phased plan that cites the ADRs it realizes. Do not propose architecture changes without checking what's already decided.
+When Kevin assigns you a task (e.g., "do task `01-admin-auth`"), read [`agent-orchestration/agent-protocol.md`](./agent-orchestration/agent-protocol.md) and follow it — it owns dep verification, citation reads, status transitions, completion, escalation. For broader project context, read [`agent-orchestration/project-overview.md`](./agent-orchestration/project-overview.md).
 
-The `docs/` layout is index-driven — start at [`docs/README.md`](./docs/README.md), which disambiguates "current authoritative" from "client-facing translation" from "earlier draft / superseded." Key entry points:
+## Current state
 
-- **[`docs/implementation-plan.md`](./docs/implementation-plan.md)** — plan of record for what's being built and in what order. Phase 0 → 4 with chunks, scope, exit criteria, and resolution blocks. Check the Status table at the bottom for current phase progress.
-- **[`docs/website-outline.md`](./docs/website-outline.md)** — pages and navigation as locked with Kristin. **This is the source of truth for the public-site page inventory and header nav.** If something in an internal draft or earlier doc disagrees with this, this wins.
-- **[`docs/parallel-claude-sessions.md`](./docs/parallel-claude-sessions.md)** — required reading **only when another Claude session is active on this repo at the same time** (Kevin will say so explicitly). Worktree setup, branch convention, and the failure mode that made the structural separation necessary. Skip if working solo on `main`.
-- **[`docs/decisions/`](./docs/decisions/)** — 21 ADRs (0001–0021), all Accepted. Read the ADR (not just its title) before touching the surface it governs.
-- **[`docs/for-kristin/`](./docs/for-kristin/)** — stakeholder-facing plain-language design docs (calendar integration → ADR-0020, dashboard workflow → ADR-0021). Useful for understanding what was promised to the client; the ADRs are how it actually gets built.
-- **[`docs/notes/`](./docs/notes/)** — internal working notes and research. **Not canonical.** Context for how decisions were reached; the relevant ADR is the actual commitment.
-- **`docs/archive/`** — local-only historical artifacts (superseded outlines, early client drafts). Don't cite these as canon. The `current-pages-for-kristin.txt` artifact lives here — it was the _first_ client-facing pages draft and has been superseded by `website-outline.md`.
+- Phase 0 (Foundation) ✓ shipped 2026-05-20
+- Phase 1 (Public Marketing Site) ✓ shipped 2026-05-26
+- Phases 2–4 not started
 
-When an ADR amendment lands, it appears as an `### Amendment YYYY-MM-DD — <title>` subsection in the ADR file itself. Affected sections in the original decision text get italic forward pointers (`*See "Amendment YYYY-MM-DD" below — ...*`). Always read the bottom of an ADR before quoting its decisions.
-
-## Current build state (verify with `git log` / `docs/implementation-plan.md`)
-
-- **Phase 0 (Foundation)** — complete. Repo, tooling, CI, deploy pipeline.
-- **Phase 1 (Public Marketing Site)** — complete (all four chunks shipped: A = Supabase Storage + image migration, B = layout chrome + nav, C = 9 conventional content routes, D = patterns catalog + category routes).
-- **Phase 2 (Admin/CMS)**, **Phase 3 (Forms & Integrations)**, **Phase 4 (Launch)** — not started.
-
-Phased execution is sequential by default. Don't start Phase N+1 work until Phase N's exit criteria are met.
+Phased execution is sequential by default; don't start Phase N+1 until Phase N's exit criteria are met. Status table + summaries: [`project-overview.md`](./agent-orchestration/project-overview.md).
 
 ## Commands
 
@@ -39,100 +27,66 @@ pnpm lint              # ESLint
 pnpm format            # Prettier --write
 pnpm format:check      # Prettier --check (CI uses this)
 pnpm typecheck         # tsc --noEmit
-pnpm test              # Vitest run (one-shot)
-pnpm test:watch        # Vitest watch mode
+pnpm test              # Vitest run
+pnpm test:watch        # Vitest watch
 pnpm test:e2e          # Playwright E2E
 pnpm check             # lint + format:check + typecheck + vitest (mirrors CI)
 pnpm check:e2e         # pnpm check + Playwright
-pnpm migrate:images    # Re-run image migration to Supabase Storage (idempotent)
+pnpm migrate:images    # Idempotent re-run of non-pattern image migration
+pnpm migrate:patterns  # Idempotent re-run of pattern image migration
+pnpm gen:tracker       # Regenerate phase task trackers from task-file frontmatter
 ```
 
-**Run a single Vitest test:** `pnpm vitest run path/to/file.test.ts -t "test name pattern"`.
-
-**Hard rule: run `pnpm check` locally before every `git push`.** It mirrors CI exactly — passing locally avoids the failure-then-hotfix loop.
-
-**Local E2E** needs Playwright browsers installed: `pnpm exec playwright install` (one-time).
-
-## Architecture
-
-### Stack
-
-- **Framework:** Next.js 16 (App Router) + React 19 + TypeScript ([ADR-0001](./docs/decisions/0001-frontend-framework.md))
-- **Hosting:** Vercel Pro, 10xDev team, region `sfo1`, preview deploys public ([ADR-0002](./docs/decisions/0002-hosting-platform.md))
-- **Runtime:** pnpm 11 on Node 24 LTS ([ADR-0003](./docs/decisions/0003-package-manager-and-node-version.md))
-- **Database / auth / storage:** Supabase Pro — Postgres + Auth + Storage ([ADRs 0005](./docs/decisions/0005-database-and-query-layer.md), [0006](./docs/decisions/0006-authentication.md), [0007](./docs/decisions/0007-image-pipeline-and-storage.md))
-- **Styling:** Tailwind v4 (CSS-first `@theme inline`) + shadcn/ui, light-mode-only ([ADR-0008](./docs/decisions/0008-styling-and-ui-layer.md))
-- **Forms:** Zod + React Hook Form + shadcn `<Form>` ([ADR-0009](./docs/decisions/0009-forms-and-validation.md)), submitted via Server Actions + Resend ([ADR-0010](./docs/decisions/0010-form-submission-and-transactional-email.md)); newsletter signup is carved out — it links/embeds Constant Contact's hosted page ([ADR-0011](./docs/decisions/0011-newsletter-esp-integration.md))
-- **Tests:** Vitest (unit) + Playwright (E2E), CI-gated ([ADR-0013](./docs/decisions/0013-testing-strategy.md))
-- **Lint/format:** ESLint 9 + Prettier ([ADR-0014](./docs/decisions/0014-linting-and-formatting.md))
-- **Analytics:** Vercel Web Analytics only ([ADR-0012](./docs/decisions/0012-analytics-and-monitoring.md))
-
-### Data model shape (built in Phase 2)
-
-The admin manages exactly two content types ([ADR-0004](./docs/decisions/0004-admin-dashboard-architecture.md)):
-
-- **Classes** — two-tier model: `classes` (named course template) → `cohorts` (specific run with a label and `kind` enum) → `cohort_sessions` (individual date+time rows). Public visibility requires class.published AND a published cohort AND that cohort having a future session ([ADR-0015](./docs/decisions/0015-content-modeling-classes.md), with [Amendment 2026-05-22](./docs/decisions/0015-content-modeling-classes.md) adding GCal sync columns).
-- **Bulletins** — single-table, markdown body, display window ([ADR-0016](./docs/decisions/0016-content-modeling-bulletin-board.md)).
-
-Class data flows one-way to Kristin's public Google Calendar via a service-account integration ([ADR-0020](./docs/decisions/0020-google-calendar-integration.md)) — DB is source of truth, GCal is a mirror.
-
-### Patterns catalog (not admin-managed)
-
-The ~165-pattern catalog is **dev-managed**, not in the database. It lives as a typed `lib/patterns.ts` module ([ADR-0017](./docs/decisions/0017-content-modeling-patterns-catalog.md)). Pattern images live in Supabase Storage at `site-images/patterns/<category>/` per the [Amendment 2026-05-22](./docs/decisions/0017-content-modeling-patterns-catalog.md) (the original `/public/` decision was reversed for consistency with the rest of the site's images).
-
-### Image storage
-
-All site images live in a single Supabase Storage bucket: `site-images`. Public-read, RLS policies for authenticated writes (admin uploads in Phase 2). Subfolders mirror routes (`site-images/portfolio/`, `site-images/classes/`, `site-images/patterns/<category>/`, etc.). The migration is idempotent via `pnpm migrate:images`. See [ADR-0007](./docs/decisions/0007-image-pipeline-and-storage.md) and `scripts/migrate-images.mjs`.
-
-### URL strategy
-
-`trailingSlash: true` in `next.config.ts` ([ADR-0018](./docs/decisions/0018-url-redirects-and-migration.md)) preserves the WordPress canonical URL form so every migrated URL is a single 301 hop. Redirects from legacy WP paths to new ones are configured in `next.config.ts` at launch time.
-
-### SEO surface
-
-`app/sitemap.ts`, per-page `metadata`, LocalBusiness JSON-LD, Course/Event JSON-LD per class — all deferred to Phase 4. Don't add these piecemeal during Phases 1–3 ([ADR-0019](./docs/decisions/0019-seo-and-schema-markup.md)).
+Single Vitest test: `pnpm vitest run path/to/file.test.ts -t "test name pattern"`. Local E2E needs `pnpm exec playwright install` once.
 
 ## Project layout
 
 ```
 src/
   app/        # Next.js App Router pages, layouts, route handlers
-  lib/        # Shared utilities (cn helper, future patterns.ts, etc.)
-  components/ # UI primitives (added via `pnpm dlx shadcn@latest add <name>`)
-e2e/          # Playwright tests
-public/       # Static assets served at /
-docs/         # ADRs, implementation plan, content extraction notes, Kristin-facing docs
-demo/         # Original styled redesign pitch — design reference, removed once Phase 1 codifies its style patterns
-scripts/      # Migration scripts (extract-content, migrate-images). Own package.json for isolated deps.
-content/      # Extracted legacy WordPress content (markdown + images). Input to migration; not served at runtime.
+  lib/        # Shared utilities (cn helper, patterns.ts, etc.)
+  components/ # UI primitives (add via `pnpm dlx shadcn@latest add <name>`)
+e2e/                  # Playwright tests
+public/               # Static assets served at /
+agent-orchestration/  # Agent execution layer: project-overview, agent-protocol, phase docs, task files, dev-guide, ADRs
+docs/                 # Stakeholder + one-off: for-kristin/, notes/, website-outline.md, parallel-claude-sessions.md
+scripts/              # Migration + tooling scripts. Own package.json.
+content/              # Extracted legacy WP content. Input to migration; not served at runtime; vercelignored.
+demo/                 # Original styled redesign pitch — design reference; vercelignored.
 ```
 
-## Project conventions
+## Tech stack
 
-**All code conventions live in [`docs/dev-guide.md`](./docs/dev-guide.md).** Read it before introducing any new library API, naming pattern, styling approach, or convention in `src/`. Every rule in the dev-guide is followed — non-negotiable, no exceptions. When you make a call that isn't yet covered (first use of a new pattern), add a section to the dev-guide in the same PR.
+- Next.js 16 App Router + React 19 + TypeScript ([ADR-0001](./agent-orchestration/decisions/0001-frontend-framework.md))
+- Vercel Pro, 10xDev team, `sfo1` ([ADR-0002](./agent-orchestration/decisions/0002-hosting-platform.md))
+- pnpm 11 + Node 24 LTS ([ADR-0003](./agent-orchestration/decisions/0003-package-manager-and-node-version.md))
+- Supabase Pro — Postgres + Auth + Storage ([ADRs 0005](./agent-orchestration/decisions/0005-database-and-query-layer.md), [0006](./agent-orchestration/decisions/0006-authentication.md), [0007](./agent-orchestration/decisions/0007-image-pipeline-and-storage.md))
+- Tailwind v4 + shadcn/ui, light-mode-only ([ADR-0008](./agent-orchestration/decisions/0008-styling-and-ui-layer.md))
+- Zod + React Hook Form + shadcn `<Form>` ([ADR-0009](./agent-orchestration/decisions/0009-forms-and-validation.md)); Server Actions + Resend ([ADR-0010](./agent-orchestration/decisions/0010-form-submission-and-transactional-email.md))
+- Vitest + Playwright, CI-gated ([ADR-0013](./agent-orchestration/decisions/0013-testing-strategy.md))
+- ESLint 9 + Prettier ([ADR-0014](./agent-orchestration/decisions/0014-linting-and-formatting.md))
 
-### Patterns image storage
+## Hard rules
 
-For _new_ pattern images: they go in **Supabase Storage** (`site-images/patterns/<category>/`), not `/public/patterns/`. The `/public/` approach was reversed in [ADR-0017 Amendment 2026-05-22](./docs/decisions/0017-content-modeling-patterns-catalog.md).
+Apply on every task regardless of dev-guide section relevance:
 
-### When to write an ADR vs. a dev-guide entry
+- **Run `pnpm check` locally before every `git push`.** Mirrors CI; passing locally avoids the failure-then-hotfix loop.
+- **All colors flow through Tailwind tokens.** No hex/rgb literals, no inline `style={{ color: ... }}`. See [dev-guide § Design tokens & styling](./agent-orchestration/dev-guide.md).
+- **No imports into `src/` from `content/`, `scripts/`, `docs/`, `agent-orchestration/`, `demo/`, or `.agents/`.** All are `.vercelignore`'d — the production build fails. See [dev-guide § Import boundaries](./agent-orchestration/dev-guide.md).
+- **Secrets:** `.env.local` is git-ignored. The Supabase secret key (`sb_secret_...`) lives only there — never in Vercel, never prefixed `NEXT_PUBLIC_`. The publishable key (`sb_publishable_...`) is client-safe and goes in Vercel.
 
-If reversing the decision would require touching many files and rewriting other decisions → ADR. Otherwise it's dev-guide-level (icon library, font choices, date utility, ID generation, build-time script details) and goes in [`docs/dev-guide.md`](./docs/dev-guide.md) as a new H2 section. See [docs/decisions/README.md#what-is-not-an-adr](./docs/decisions/README.md#what-is-not-an-adr) for the delineation. Authoring rule: write the section the first time a convention lands in code, in the same PR.
+## ADR workflow
 
-### ADR workflow
+ADRs in [`agent-orchestration/decisions/`](./agent-orchestration/decisions/) are immutable once Accepted. To change a decision, add `### Amendment YYYY-MM-DD — <title>` at the bottom of the ADR plus italic forward pointers from each affected section. Always read the bottom of an ADR before quoting it.
 
-ADRs are immutable once Accepted. To change a decision, write an Amendment subsection at the bottom of the ADR with the date and what changed, and add italic forward pointers from each section the amendment affects so a reader doesn't walk away with stale premises. Pending amendments from an In-Discussion ADR live as an "On acceptance — amendment to drop into ADR-NNNN" section in the proposing ADR; they're only applied to the target ADR when the proposing ADR moves to Accepted (see ADR-0020's pattern).
+When to write an ADR vs. a dev-guide entry: if reversing the decision touches many files and rewrites other decisions → ADR; otherwise dev-guide (add the section in the same PR per dev-guide's authoring rule). Delineation in [`agent-orchestration/decisions/README.md`](./agent-orchestration/decisions/README.md).
 
-### Secrets
+## Supabase tooling
 
-`.env.local` is local-only and git-ignored. The Supabase **secret key** (`sb_secret_...`, modern replacement for the legacy `service_role` JWT) lives only in `.env.local`; it is **not** added to Vercel and is never prefixed with `NEXT_PUBLIC_`. The publishable key (`sb_publishable_...`) is the client-safe key; it goes in Vercel for preview + production. Use modern keys, not legacy `anon` / `service_role` JWTs.
+Skills installed at `.agents/skills/supabase` and `.agents/skills/supabase-postgres-best-practices`. Invoke before first Supabase API use per session — they capture RLS gotchas (Storage upsert needs INSERT + SELECT + UPDATE; views bypass RLS unless `security_invoker = true`; `TO authenticated` alone is BOLA/IDOR) absent from training data.
 
-### Supabase MCP and skills
+Use Supabase MCP `execute_sql` for iterative schema work, `apply_migration` to commit stable changes, `get_advisors` after DDL. No Storage MCP tools — bucket creation is via SQL (`storage.buckets` is a regular table); uploads via local Node scripts using `@supabase/supabase-js`.
 
-The Supabase agent skills are installed at `.agents/skills/supabase` and `.agents/skills/supabase-postgres-best-practices`. Invoke them before introducing Supabase API surface for the first time in a session — they capture RLS gotchas (e.g., "Storage upsert requires INSERT + SELECT + UPDATE", "views bypass RLS unless `security_invoker = true`", "`TO authenticated` alone is BOLA/IDOR") that aren't in stale training data.
+## Tool ignore-list scope
 
-Use the Supabase MCP `execute_sql` for iterative schema work and `apply_migration` to commit stable changes (the migration history row is what `supabase db pull` will materialize as a migration file locally later). Run `get_advisors` after any DDL — it catches missing RLS and similar issues. **No Storage MCP tools exist**; bucket creation is via SQL (`storage.buckets` is a regular table) and file uploads are via local Node scripts using `@supabase/supabase-js` with the secret key.
-
-### Prettier / ESLint scope
-
-Prettier ignores `docs/`, `demo/`, `content/`, `scripts/`, and `.agents/` (per `.prettierignore`). ESLint runs across `src/` and `e2e/`. Markdown in `docs/` is preserved in author style (Kevin's writing); don't auto-format it.
+Prettier ignores `docs/`, `agent-orchestration/`, `demo/`, `content/`, `scripts/`, `.agents/`. ESLint runs across `src/` and `e2e/`.

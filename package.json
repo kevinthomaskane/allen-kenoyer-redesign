@@ -21,7 +21,8 @@
     "check": "pnpm lint && pnpm format:check && pnpm typecheck && pnpm test",
     "check:e2e": "pnpm check && pnpm test:e2e",
     "migrate:images": "node --env-file=.env.local scripts/migrate-images.mjs",
-    "migrate:patterns": "node --env-file=.env.local scripts/migrate-pattern-images.mjs"
+    "migrate:patterns": "node --env-file=.env.local scripts/migrate-pattern-images.mjs",
+    "gen:tracker": "node scripts/gen-tracker.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.106.1",

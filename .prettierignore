@@ -12,6 +12,7 @@ scripts
 
 # Docs are domain writing, not code — keep author's style.
 docs
+agent-orchestration
 
 # Installed agent skills (external authors, not ours to reformat).
 .agents

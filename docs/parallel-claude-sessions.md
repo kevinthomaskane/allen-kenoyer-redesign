@@ -79,18 +79,6 @@ git push origin --delete parallel/<task-name>
 
 Worktrees are first-class — `git worktree list` shows all active worktrees, `git worktree remove` cleans up a specific one.
 
-## Per-session handoff doc
-
-Kevin writes a per-session handoff doc when delegating parallel work. The handoff opens with these lines, filled in:
-
-> Read `docs/parallel-claude-sessions.md` first.
->
-> - **Branch:** `parallel/<task-name>`
-> - **Worktree:** `../ak-<short-task-name>`
-> - **Setup:** follow the setup commands in the guide.
-
-After the header, the handoff describes the work items, scope, and any session-specific context (e.g., "the other Claude is working on Chunk B, don't touch `src/components/`"). The handoff doc is deleted as part of the final commit on the parallel branch.
-
 ## Gotchas
 
 - **Vercel preview deploys:** both branches will get preview URLs from Vercel after their first push. That's fine; just be aware when reviewing.
