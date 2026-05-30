@@ -196,7 +196,13 @@ Cohort sessions, bulletin display windows, and GCal sync all touch timestamps. T
   - **Display → native `Intl.DateTimeFormat`** with `{ timeZone: STUDIO_TZ }`. No library — it is the correct, DST-aware tool for formatting.
   - **Wall-time→UTC conversion and DST-safe recurrence stepping → Luxon.** `DateTime.fromObject({ … }, { zone: STUDIO_TZ }).toUTC()` for storage; `.plus({ weeks: 1 })` for the recurrence builder's row expansion ([ADR-0021](./decisions/0021-admin-class-workflow-ux.md) decision D). Luxon is used *only* for these in-zone operations, not as a general formatting layer.
 
-Display conventions (exact format strings, range rendering like "6:00–8:30 PM") are settled as they land in the first scheduling-UI PR. ADR anchors: [ADR-0015](./decisions/0015-content-modeling-classes.md), [ADR-0020](./decisions/0020-google-calendar-integration.md), [ADR-0021](./decisions/0021-admin-class-workflow-ux.md).
+**Display helpers** live in [`src/lib/datetime.ts`](../src/lib/datetime.ts), all keyed to `STUDIO_TZ` (which now lives in [`site-config.ts`](../src/lib/site-config.ts)):
+
+- `formatStudioDate(iso)` → `"Jun 1, 2026"`
+- `formatStudioDateTime(iso)` → `"Jun 1, 2026, 6:00 PM"`
+- `formatNextSession(iso | null)` → the above, or an em dash (`—`) for null (the rich list's empty Next-session cell).
+
+These normalize ICU's narrow-no-break space (U+202F, emitted by Node 24 before AM/PM) to a regular space so output is predictable and testable. Range rendering ("6:00–8:30 PM") isn't needed until session rows render (task 04); add it here when it lands. ADR anchors: [ADR-0015](./decisions/0015-content-modeling-classes.md), [ADR-0020](./decisions/0020-google-calendar-integration.md), [ADR-0021](./decisions/0021-admin-class-workflow-ux.md).
 
 ---
 
@@ -213,6 +219,13 @@ The exact `allowedElements` list and the link-component override are filled in w
 
 ---
 
-## Admin image upload *(stub — Phase 2)*
+## Admin image upload
 
-Browser-side upload via `supabase-js` writing to the `site-images` bucket, per [ADR-0007](./decisions/0007-image-pipeline-and-storage.md) and [ADR-0021](./decisions/0021-admin-class-workflow-ux.md) (decision K). Fill in once the first admin upload form ships.
+Browser-side upload via `supabase-js` writing to the `site-images` bucket, per [ADR-0007](./decisions/0007-image-pipeline-and-storage.md) and [ADR-0021](./decisions/0021-admin-class-workflow-ux.md) (decision H). The class image control is `src/app/admin/classes/image-field.tsx`.
+
+- **Direct browser write.** On file pick, bytes upload from the client (`createClient()` from [`supabase/client.ts`](../src/lib/supabase/client.ts)) under Kristin's authenticated session — never through the Server Action. The action only persists the returned URL + alt text on Save. The Phase 1 RLS policy grants `authenticated` INSERT/UPDATE on `site-images` (upsert needs both).
+- **Path convention:** `classes/<uuid>-<slugified-filename>.<ext>` via `crypto.randomUUID()`. The UUID prefix prevents two classes that upload a same-named file from clobbering each other. This deviates from a fully deterministic path; the ADR's orphan residual (pick a file, never Save) is accepted in a public-read bucket.
+- **Public URL** comes from `storage.from(BUCKET).getPublicUrl(path)`, not hand-composed. (Dev-managed catalogs still use the `siteImageUrl` / `patternImageUrl` helpers; admin uploads use the SDK's public-URL accessor since the path is generated at upload time.)
+- **Alt text is required when an image is present** — enforced in `classFormSchema` (`src/lib/class-form-schema.ts`), not just the UI.
+
+ADR anchors: [ADR-0007](./decisions/0007-image-pipeline-and-storage.md), [ADR-0021](./decisions/0021-admin-class-workflow-ux.md).
