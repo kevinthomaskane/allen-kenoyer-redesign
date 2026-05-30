@@ -165,15 +165,31 @@ Fill in when the first Phase 2 PR that touches schema-generated types lands.
 
 ---
 
-## Date/time handling *(stub — Phase 2)*
+## Date/time handling
 
-Cohort sessions, bulletin display windows, and GCal sync all need consistent date/time handling. Decide library, timezone rule, and display conventions during Phase 2 when the class scheduling UI lands. ADR anchors: [ADR-0015](./decisions/0015-content-modeling-classes.md), [ADR-0020](./decisions/0020-google-calendar-integration.md).
+Cohort sessions, bulletin display windows, and GCal sync all touch timestamps. The rules:
+
+- **Storage is UTC.** All datetime columns are `timestamptz` ([ADR-0005](./decisions/0005-database-and-query-layer.md), [ADR-0015](./decisions/0015-content-modeling-classes.md)); rows hold UTC instants. Visibility comparisons (`ends_at > now()`, bulletin display windows) run in Postgres, never in JS.
+- **Convert only at the boundaries.** Kristin's wall-clock input → UTC on write; UTC → studio-local on display and on the GCal push.
+- **Studio zone is a hardcoded constant.** `STUDIO_TZ = "America/Los_Angeles"` lives in [`src/lib/site-config.ts`](../src/lib/site-config.ts) alongside the other studio facts. Every conversion references it; there is no per-record or admin-editable zone.
+- **Library split:**
+  - **Display → native `Intl.DateTimeFormat`** with `{ timeZone: STUDIO_TZ }`. No library — it is the correct, DST-aware tool for formatting.
+  - **Wall-time→UTC conversion and DST-safe recurrence stepping → Luxon.** `DateTime.fromObject({ … }, { zone: STUDIO_TZ }).toUTC()` for storage; `.plus({ weeks: 1 })` for the recurrence builder's row expansion ([ADR-0021](./decisions/0021-admin-class-workflow-ux.md) decision D). Luxon is used *only* for these in-zone operations, not as a general formatting layer.
+
+Display conventions (exact format strings, range rendering like "6:00–8:30 PM") are settled as they land in the first scheduling-UI PR. ADR anchors: [ADR-0015](./decisions/0015-content-modeling-classes.md), [ADR-0020](./decisions/0020-google-calendar-integration.md), [ADR-0021](./decisions/0021-admin-class-workflow-ux.md).
 
 ---
 
-## Markdown rendering *(stub — Phase 2)*
+## Markdown rendering
 
-Bulletin messages are stored as markdown ([ADR-0016](./decisions/0016-content-modeling-bulletin-board.md)). Pick a renderer (`react-markdown` with allowlisted nodes is a sensible default) and a sanitization story when the bulletin display surface ships in Phase 2. Phase 1 explicitly excluded a content-rendering pipeline.
+Bulletin messages are stored as markdown ([ADR-0016](./decisions/0016-content-modeling-bulletin-board.md)) and rendered on the public homepage with **`react-markdown`**.
+
+- **Renders to React elements** — no `dangerouslySetInnerHTML`, no HTML-string pipeline.
+- **No raw HTML passthrough.** `rehype-raw` is deliberately *not* added; markdown is the only authoring surface.
+- **Allowlist the toolbar's vocabulary.** Restrict rendered elements to what the admin toolbar emits — bold, italic, links, lists, paragraphs ([ADR-0016](./decisions/0016-content-modeling-bulletin-board.md)) — via react-markdown's `allowedElements`. Add `remark-gfm` only if a real need for tables/strikethrough appears.
+- **Trust model:** the sole author is the invite-only admin ([ADR-0006](./decisions/0006-authentication.md)), so this is defense-in-depth on trusted content, not untrusted-input XSS handling. Rendered links still get `rel="noopener noreferrer"`.
+
+The exact `allowedElements` list and the link-component override are filled in when the bulletin display component ships. ADR anchor: [ADR-0016](./decisions/0016-content-modeling-bulletin-board.md).
 
 ---
 
