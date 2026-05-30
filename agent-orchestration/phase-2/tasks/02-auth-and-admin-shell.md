@@ -82,15 +82,23 @@ sign-out round-trip passes. A throwaway test admin user was created via the
 Supabase admin API (secret key from `.env.local`); `E2E_ADMIN_EMAIL` /
 `E2E_ADMIN_PASSWORD` live in gitignored `.env.local` and gate that one E2E test.
 
-**Required follow-ups (Supabase Dashboard — no Management-API token available, so
-these are Kevin's, accepted per his "finalize now" call):**
-1. **Disable public signup** (Authentication → Providers → Email) — ADR-0006
-   invite-only; scope item 6. Defense-in-depth (the app never calls `signUp`).
-2. **Allowlist the reset redirect URL** (Authentication → URL Configuration) —
-   add `http://localhost:3000/admin/reset-password` and the production URL. The
-   password-reset code is built and correct, but the end-to-end round-trip needs
-   this config plus a real email-link click (email-based reset isn't
-   E2E-automatable), so that one exit-criterion is verified-pending-config.
+**Follow-ups (Supabase Dashboard — no Management-API token available, so these
+were Kevin's), both completed 2026-05-29:**
+1. **Disable public signup** — done; verified via an anon `signUp` probe
+   returning `422 signup_disabled` ("Signups not allowed for this instance").
+   ADR-0006 invite-only; scope item 6.
+2. **Allowlist the reset redirect URL** — done. The password-reset code is built
+   and correct; the end-to-end round-trip's only remaining step is a real
+   email-link click (email-based reset isn't E2E-automatable), now unblocked.
+
+**Post-merge fix.** The first preview deploy failed: the task-01 `.vercelignore`
+entry `supabase/` (unanchored) also matched `src/lib/supabase/`, so Vercel
+stripped the client factories and the admin build hit `Module not found:
+@/lib/supabase/client`. `next build` and CI don't apply `.vercelignore`, so it
+surfaced only on Vercel. Fixed by anchoring both `.vercelignore` and
+`.prettierignore` to `/supabase` (the latter had been silently skipping
+format-checks on `src/lib/supabase/`). Also confirmed the project uses
+asymmetric JWT signing keys (ES256), so `getClaims()` verifies locally.
 
 PR: https://github.com/kevinthomaskane/allen-kenoyer-redesign/pull/2
 </content>
