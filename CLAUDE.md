@@ -53,6 +53,7 @@ scripts/              # Migration + tooling scripts; own package.json
 content/              # Extracted legacy WordPress content; input to migration, not served at runtime
 demo/                 # Original styled redesign pitch — design reference
 .agents/              # Installed agent skills (supabase, supabase-postgres-best-practices)
+supabase/             # SQL migrations mirroring remote DB history (ADR-0005, MCP-direct workflow)
 ```
 
 ## Tech stack
@@ -71,7 +72,7 @@ demo/                 # Original styled redesign pitch — design reference
 Apply on every task:
 
 - **Run `pnpm check` locally before every `git push`.** Mirrors CI; passing locally avoids the failure-then-hotfix loop.
-- **No imports into `src/` from `content/`, `scripts/`, `docs/`, `agent-orchestration/`, `demo/`, or `.agents/`.** All are `.vercelignore`'d — the production build fails. See [dev-guide § Import boundaries](./agent-orchestration/dev-guide.md).
+- **No imports into `src/` from `content/`, `scripts/`, `docs/`, `agent-orchestration/`, `demo/`, `.agents/`, or `supabase/`.** All are `.vercelignore`'d — the production build fails. See [dev-guide § Import boundaries](./agent-orchestration/dev-guide.md).
 
 ## ADR workflow
 

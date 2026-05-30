@@ -16,3 +16,9 @@ agent-orchestration
 
 # Installed agent skills (external authors, not ours to reformat).
 .agents
+
+# Database migration record (SQL + notes), not application code.
+supabase
+
+# Supabase-generated types — committed artifact, matches `gen types` output.
+src/types/database.ts

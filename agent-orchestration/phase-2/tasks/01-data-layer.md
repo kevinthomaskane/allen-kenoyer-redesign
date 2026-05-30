@@ -2,7 +2,7 @@
 id: 01-data-layer
 title: Data layer & schema
 phase: 2
-status: todo
+status: done
 depends_on: []
 adrs_realized: [0005, 0006, 0015, 0016]
 ---
@@ -52,6 +52,50 @@ The full column lists, enums, and the three-condition visibility rule are specif
 
 ## Resolution
 
-_Appended on completion. Document what shipped, any in-flight decisions or
-deviations, and the PR link._
+Shipped 2026-05-29 on branch `phase-2/01-data-layer`. **Workflow decision:** the
+ADR-0005 Supabase CLI workflow (`supabase/migrations/` via `db push` + GH Action
+backstop) was never scaffolded — Phase 1 applied schema through the MCP
+connector. Kevin chose to continue **MCP-direct**, so ADR-0005 was edited in
+place to record that as the current decision (connector `apply_migration` +
+`supabase/migrations/` as a mirrored review record; no `db push`, no Action, no
+`config.toml`). This is the one deviation from the task as written and it is now
+the ADR.
+
+**Schema** applied to project `allen-kenoyer-glass` (`lgbeihhbkwnxykaaebbj`,
+Postgres 17) as two migrations — `20260530001350_phase2_content_schema` and
+`20260530001419_phase2_rls_and_policies`. Four tables (`classes`, `cohorts`,
+`cohort_sessions`, `bulletins`); three enums (`class_category`, `skill_level`,
+`cohort_kind`); `sync_status` as a CHECK-constrained text column per ADR-0015's
+"text (enum-checked)"; FKs with `on delete cascade`; indexes on
+`cohorts.class_id`, `cohort_sessions.{cohort_id,ends_at,starts_at}`,
+`bulletins.display_start`; `extensions.moddatetime` triggers for `updated_at`;
+CHECK constraints for image-alt-when-image, label-required-for-multi-session,
+and `ends_at > starts_at` / `display_end > display_start`. All datetimes are
+`timestamptz` (UTC) per dev-guide § Date/time handling.
+
+**RLS** (ADR-0006): anon `SELECT` limited to published rows — classes/cohorts on
+`published`, sessions gated on parent cohort published, bulletins on
+published + active window; authenticated `SELECT` all; authenticated full CRUD
+with `USING/WITH CHECK (true)` per ADR-0004's flat model. Verified by
+role-switched queries (anon saw 1/2 classes and 1/4 bulletins; authenticated saw
+both classes). `get_advisors` (security): the 12 `rls_policy_always_true` WARNs
+on the write policies are **accepted** — they are the intentional flat-permission
+model, not an oversight (no per-row ownership exists); plus the pre-existing,
+already-accepted `public_bucket_allows_listing` on `site-images`. No other
+findings.
+
+**Code:** generated types committed to `src/types/database.ts` (via the MCP
+connector; Prettier-ignored as a generated artifact); typed `@supabase/ssr@0.10.3`
+client factories at `src/lib/supabase/client.ts` (browser) and `server.ts`
+(server/RSC, with the read-only-cookie guard for Server Components — session
+refresh lands in task 02); pure visibility predicates at `src/lib/visibility.ts`
+with 10 unit tests (bulletin window + three-condition class rule). The applied
+SQL is mirrored into `supabase/migrations/` (all four migrations, including the
+two backfilled Phase-1 storage ones) with `supabase/README.md` documenting the
+MCP-direct workflow. `supabase/` added to `.vercelignore` / `.prettierignore` and
+the import-boundary lists (CLAUDE.md, dev-guide). Dev-guide § Type discipline
+stub filled in.
+
+`pnpm check` ✓ (lint + format + typecheck + 25 vitest tests) and `pnpm test:e2e`
+✓ (16/16, unchanged Phase-1 routes). PR: https://github.com/kevinthomaskane/allen-kenoyer-redesign/pull/1.
 </content>
