@@ -3,8 +3,9 @@
 // for the four service pages; Classes/Supplies dropdowns each with one sub-route).
 
 // The studio's wall-clock timezone. Hardcoded, single source of truth for every
-// UTC↔local conversion (dev-guide § Date/time handling); there is no per-record
-// or admin-editable zone. Consumed by src/lib/studio-time.ts.
+// UTC↔local conversion and datetime display (dev-guide § Date/time handling);
+// there is no per-record or admin-editable zone (ADR-0015, ADR-0020, ADR-0021).
+// Consumed by src/lib/studio-time.ts and src/lib/datetime.ts.
 export const STUDIO_TZ = "America/Los_Angeles";
 
 export const siteContact = {

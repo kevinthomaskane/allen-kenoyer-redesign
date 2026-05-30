@@ -210,7 +210,12 @@ Cohort sessions, bulletin display windows, and GCal sync all touch timestamps. T
   - **Display → native `Intl.DateTimeFormat`** with `{ timeZone: STUDIO_TZ }`. No library — it is the correct, DST-aware tool for formatting.
   - **Wall-time→UTC conversion and DST-safe recurrence stepping → Luxon.** `DateTime.fromObject({ … }, { zone: STUDIO_TZ }).toUTC()` for storage; `.plus({ weeks: 1 })` for the recurrence builder's row expansion ([ADR-0021](./decisions/0021-admin-class-workflow-ux.md) decision D). Luxon is used *only* for these in-zone operations, not as a general formatting layer.
 
-**Helpers live in [`src/lib/studio-time.ts`](../src/lib/studio-time.ts).** `wallTimeToUtc` / `utcToWallTimeInput` / `nowWallTimeInput` (Luxon, for `<input type="datetime-local">` ↔ UTC) and `formatStudioDateTime` (Intl `dateStyle: "medium"` + `timeStyle: "short"` → "Jun 1, 2026, 6:00 PM"). First landed by **task 05** (bulletin display windows); **task 04** extends it with the recurrence stepping for session rows. Never `new Date(localInput)` for storage — that silently uses the *browser's* zone, not `STUDIO_TZ`.
+**Helpers live in [`src/lib/studio-time.ts`](../src/lib/studio-time.ts)** — the single studio-tz module:
+
+- Luxon, for `<input type="datetime-local">` ↔ UTC: `wallTimeToUtc` / `utcToWallTimeInput` / `nowWallTimeInput`.
+- Intl display (DST-aware, no library): `formatStudioDateTime` ("Jun 1, 2026, 6:00 PM") and `formatStudioDate` ("Jun 1, 2026").
+
+First landed by **task 05** (bulletin display windows); **task 03** added `formatStudioDate` for the class list and renders dates server-side (so the client table ships no date library); **task 04** extends it with recurrence stepping for session rows. Never `new Date(localInput)` for storage — that silently uses the *browser's* zone, not `STUDIO_TZ`. The list's empty Next-session cell renders an em dash inline; no separate helper.
 
 Range rendering for multi-session cohorts ("6:00–8:30 PM") is settled as it lands in the scheduling-UI PR. ADR anchors: [ADR-0015](./decisions/0015-content-modeling-classes.md), [ADR-0020](./decisions/0020-google-calendar-integration.md), [ADR-0021](./decisions/0021-admin-class-workflow-ux.md).
 
@@ -229,9 +234,16 @@ The exact `allowedElements` list and the link-component override are filled in w
 
 ---
 
-## Admin image upload *(stub — Phase 2)*
+## Admin image upload
 
-Browser-side upload via `supabase-js` writing to the `site-images` bucket, per [ADR-0007](./decisions/0007-image-pipeline-and-storage.md) and [ADR-0021](./decisions/0021-admin-class-workflow-ux.md) (decision K). Fill in once the first admin upload form ships.
+Browser-side upload via `supabase-js` writing to the `site-images` bucket, per [ADR-0007](./decisions/0007-image-pipeline-and-storage.md) and [ADR-0021](./decisions/0021-admin-class-workflow-ux.md) (decision H). The class image control is `src/app/admin/(protected)/classes/image-field.tsx`.
+
+- **Direct browser write.** On file pick, bytes upload from the client (`createClient()` from [`supabase/client.ts`](../src/lib/supabase/client.ts)) under Kristin's authenticated session — never through the Server Action. The action only persists the returned URL + alt text on Save. The Phase 1 RLS policy grants `authenticated` INSERT/UPDATE on `site-images` (upsert needs both).
+- **Path convention:** `classes/<uuid>-<slugified-filename>.<ext>` via `crypto.randomUUID()`. The UUID prefix prevents two classes that upload a same-named file from clobbering each other. This deviates from a fully deterministic path; the ADR's orphan residual (pick a file, never Save) is accepted in a public-read bucket.
+- **Public URL** comes from `storage.from(BUCKET).getPublicUrl(path)`, not hand-composed. (Dev-managed catalogs still use the `siteImageUrl` / `patternImageUrl` helpers; admin uploads use the SDK's public-URL accessor since the path is generated at upload time.)
+- **Alt text is required when an image is present** — enforced in `classFormSchema` (`src/lib/class-form-schema.ts`), not just the UI.
+
+ADR anchors: [ADR-0007](./decisions/0007-image-pipeline-and-storage.md), [ADR-0021](./decisions/0021-admin-class-workflow-ux.md).
 
 ---
 
