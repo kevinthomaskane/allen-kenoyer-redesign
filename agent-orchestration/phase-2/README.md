@@ -31,7 +31,7 @@ Sliced by system/workstream. The data layer and the auth shell are the shared fo
 
 - **C — Classes admin.** `/admin/classes` rich list (columns, sort, filters, search per [ADR-0021](../decisions/0021-admin-class-workflow-ux.md) J), `/admin/classes/new`, `/admin/classes/[id]` detail with the sectioned class form, auto-derived slug, status pill + targeted banner ([ADR-0021](../decisions/0021-admin-class-workflow-ux.md) F/I), and inline class-image upload via browser-side `supabase-js` ([ADR-0007](../decisions/0007-image-pipeline-and-storage.md), [ADR-0021](../decisions/0021-admin-class-workflow-ux.md) H). Establishes the shared date/time display helpers (Intl) for the "Next session" column.
 
-- **D — Cohorts & sessions (scheduling).** Inline cohort management on the class detail page: modal cohort form, the two entry points ("New cohort" multi-session with recurring builder + per-row edits; "New single session"), past-cohort accordion ([ADR-0021](../decisions/0021-admin-class-workflow-ux.md) B/D/G/L). Establishes the Luxon-based wall-time↔UTC `studio-time` utilities for session input and recurrence expansion (dev-guide § Date/time handling).
+- **D — Cohorts & sessions (scheduling).** Inline cohort management on the class detail page: modal cohort form, the two entry points ("New cohort" multi-session with recurring builder + per-row edits; "New single session"), past-cohort accordion ([ADR-0021](../decisions/0021-admin-class-workflow-ux.md) B/D/G/L). Extends the Luxon-based wall-time↔UTC `studio-time` utilities with recurrence expansion for session rows (dev-guide § Date/time handling); the base module (`src/lib/studio-time.ts`, `STUDIO_TZ`) was landed early by workstream E's bulletin display windows.
 
 - **E — Bulletins admin.** `/admin/bulletins` list (active + "Show past") and the create/edit form with the markdown toolbar (bold/italic/link/list) and the `display_start`/`display_end` window controls, including the "published but not visible yet" state surfacing ([ADR-0016](../decisions/0016-content-modeling-bulletin-board.md)). *Parallel with C/D — independent surface sharing only A + B.*
 
@@ -70,7 +70,7 @@ Sliced by system/workstream. The data layer and the auth shell are the shared fo
 | 02-auth-and-admin-shell | Auth & admin shell | done | 01-data-layer |
 | 03-classes-admin | Classes admin | todo | 02-auth-and-admin-shell |
 | 04-cohorts-and-sessions | Cohorts & sessions | todo | 03-classes-admin |
-| 05-bulletins-admin | Bulletins admin | todo | 02-auth-and-admin-shell |
+| 05-bulletins-admin | Bulletins admin | done | 02-auth-and-admin-shell |
 | 06-gcal-sync | Google Calendar sync | todo | 04-cohorts-and-sessions |
 | 07-public-read-wiring | Public-site read wiring | todo | 04-cohorts-and-sessions, 05-bulletins-admin |
 

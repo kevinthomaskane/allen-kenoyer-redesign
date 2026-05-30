@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 
-import { isBulletinVisible, isClassVisible } from "./visibility";
+import {
+  bulletinStatus,
+  isBulletinVisible,
+  isClassVisible,
+} from "./visibility";
 
 const NOW = new Date("2026-06-01T12:00:00Z");
 const PAST = "2026-05-01T12:00:00Z";
@@ -50,6 +54,53 @@ describe("isBulletinVisible", () => {
         NOW,
       ),
     ).toBe(true);
+  });
+});
+
+describe("bulletinStatus", () => {
+  it("classifies a draft regardless of window", () => {
+    expect(
+      bulletinStatus(
+        { published: false, display_start: PAST, display_end: FUTURE },
+        NOW,
+      ),
+    ).toBe("draft");
+  });
+
+  it("classifies a published future-start bulletin as queued", () => {
+    expect(
+      bulletinStatus(
+        { published: true, display_start: FUTURE, display_end: null },
+        NOW,
+      ),
+    ).toBe("queued");
+  });
+
+  it("classifies a published in-window bulletin as visible", () => {
+    expect(
+      bulletinStatus(
+        { published: true, display_start: PAST, display_end: FUTURE },
+        NOW,
+      ),
+    ).toBe("visible");
+  });
+
+  it("classifies an open-ended (null end) published bulletin as visible", () => {
+    expect(
+      bulletinStatus(
+        { published: true, display_start: PAST, display_end: null },
+        NOW,
+      ),
+    ).toBe("visible");
+  });
+
+  it("classifies a published past-end bulletin as expired", () => {
+    expect(
+      bulletinStatus(
+        { published: true, display_start: PAST, display_end: PAST },
+        NOW,
+      ),
+    ).toBe("expired");
   });
 });
 

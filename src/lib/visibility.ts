@@ -12,19 +12,39 @@ type Cohort = Tables<"cohorts">;
 type Session = Tables<"cohort_sessions">;
 
 /**
+ * The four admin-facing bulletin states (ADR-0016 + its "published but not
+ * visible yet" tradeoff note). `published` intent and the display window combine
+ * into one of these; the admin UI must make each unambiguous.
+ *
+ * - `draft`    — not published (window irrelevant).
+ * - `queued`   — published, but `display_start` is still in the future.
+ * - `expired`  — published, but `display_end` has passed.
+ * - `visible`  — published and currently within its display window.
+ */
+export type BulletinStatus = "draft" | "queued" | "visible" | "expired";
+
+export function bulletinStatus(
+  bulletin: Pick<Bulletin, "published" | "display_start" | "display_end">,
+  now: Date = new Date(),
+): BulletinStatus {
+  if (!bulletin.published) return "draft";
+  if (new Date(bulletin.display_start) > now) return "queued";
+  if (bulletin.display_end !== null && new Date(bulletin.display_end) <= now) {
+    return "expired";
+  }
+  return "visible";
+}
+
+/**
  * ADR-0016: a bulletin is visible iff published, started, and not yet ended.
- * A null `display_end` means open-ended.
+ * A null `display_end` means open-ended. Delegates to `bulletinStatus` so the
+ * boolean and the four-state classifier can never disagree.
  */
 export function isBulletinVisible(
   bulletin: Pick<Bulletin, "published" | "display_start" | "display_end">,
   now: Date = new Date(),
 ): boolean {
-  if (!bulletin.published) return false;
-  if (new Date(bulletin.display_start) > now) return false;
-  if (bulletin.display_end !== null && new Date(bulletin.display_end) <= now) {
-    return false;
-  }
-  return true;
+  return bulletinStatus(bulletin, now) === "visible";
 }
 
 /** A session counts as upcoming while it has not yet ended. */
