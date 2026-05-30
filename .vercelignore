@@ -4,4 +4,6 @@ docs/
 agent-orchestration/
 demo/
 .agents/
-supabase/
+# Anchored to root so it excludes the top-level migrations dir only —
+# NOT src/lib/supabase/ (the client factories the app imports).
+/supabase/

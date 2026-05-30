@@ -2,7 +2,7 @@
 id: 02-auth-and-admin-shell
 title: Auth & admin shell
 phase: 2
-status: todo
+status: done
 depends_on: [01-data-layer]
 adrs_realized: [0004, 0006, 0021]
 ---
@@ -48,6 +48,49 @@ Touches Supabase Auth — invoke the `supabase` skill before first use for the `
 
 ## Resolution
 
-_Appended on completion. Document what shipped, any in-flight decisions or
-deviations, and the PR link._
+Shipped 2026-05-29 on branch `phase-2/02-auth-and-admin-shell`.
+
+**Structure (Kevin's call).** Introduced a route-group split so the admin doesn't
+inherit the public marketing chrome: public routes moved into `src/app/(public)/`
+(its layout holds `InfoBar` + `SiteNav` + footer), the root `layout.tsx` is now a
+bare html/body/fonts shell, and admin chrome lives in
+`src/app/admin/(protected)/layout.tsx`. Route groups don't change URLs, so all 14
+Phase-1 routes are unchanged (E2E still green). Documented in dev-guide §
+App structure.
+
+**Two corrections from Kevin, both applied:** (1) the middleware lives in
+`src/proxy.ts` exporting `proxy` — Next.js 16 renamed the `middleware` convention
+(verified against the Next 16 upgrade docs); (2) the dev server is not needed and
+was killed for a clean E2E run.
+
+**Auth.** `@supabase/ssr` session refresh + `/admin/*` gating in `src/proxy.ts`
+→ `src/lib/supabase/middleware.ts`, using `getClaims()` (current Supabase SSR
+guidance; the task context's `getUser` note predated checking the docs — noted as
+a deviation). Redirect decision extracted to a pure `src/lib/auth-routes.ts`
+helper with unit tests. `/admin/login` (custom `signInWithPassword` form +
+"forgot password" → `resetPasswordForEmail`), `/admin/reset-password` (PKCE
+`exchangeCodeForSession` + `updateUser`), a `signOut` server action, and the
+`/admin` dashboard with two plain navigation cards (ADR-0021 K). Login/reset forms
+use shadcn primitives (added `card`/`input`/`label`); the heavier Zod + RHF +
+`<Form>` stack (ADR-0009) is deferred to task 03's class form. No `/signup` route.
+
+**Verification.** `pnpm check` ✓ (lint + format + typecheck + 30 vitest tests,
+incl. the new `auth-routes` tests). `pnpm test:e2e` ✓ (21 passed) — `/admin` and
+`/admin/classes` redirect to `/admin/login`, login page reachable, `/signup`
+404s, all 14 Phase-1 routes still pass, and the seeded-admin login → dashboard →
+sign-out round-trip passes. A throwaway test admin user was created via the
+Supabase admin API (secret key from `.env.local`); `E2E_ADMIN_EMAIL` /
+`E2E_ADMIN_PASSWORD` live in gitignored `.env.local` and gate that one E2E test.
+
+**Required follow-ups (Supabase Dashboard — no Management-API token available, so
+these are Kevin's, accepted per his "finalize now" call):**
+1. **Disable public signup** (Authentication → Providers → Email) — ADR-0006
+   invite-only; scope item 6. Defense-in-depth (the app never calls `signUp`).
+2. **Allowlist the reset redirect URL** (Authentication → URL Configuration) —
+   add `http://localhost:3000/admin/reset-password` and the production URL. The
+   password-reset code is built and correct, but the end-to-end round-trip needs
+   this config plus a real email-link click (email-based reset isn't
+   E2E-automatable), so that one exit-criterion is verified-pending-config.
+
+PR: https://github.com/kevinthomaskane/allen-kenoyer-redesign/pull/2
 </content>

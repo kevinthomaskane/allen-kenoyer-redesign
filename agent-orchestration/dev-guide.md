@@ -127,6 +127,22 @@ Don't loosen `.vercelignore` to ship one of these directories; relocate to `src/
 
 ---
 
+## App structure — route groups & admin
+
+Two route groups keep the public site and the admin shell visually separate while sharing one Next.js app ([ADR-0004](./decisions/0004-admin-dashboard-architecture.md)):
+
+- **`src/app/(public)/`** — the marketing site. Its `layout.tsx` carries the public chrome (`InfoBar` + `SiteNav` + footer). Route groups don't change URLs, so these stay at `/`, `/classes`, etc.
+- **`src/app/admin/`** — the admin surface. `admin/(protected)/layout.tsx` carries the admin chrome (header + sign-out) and guards auth; authenticated pages (dashboard, and the future classes/bulletins screens) live inside `(protected)/`. `admin/login/` and `admin/reset-password/` sit *outside* the group so unauthenticated visitors can reach them.
+- The **root `layout.tsx`** is a bare html/body/fonts shell — no chrome. A new top-level surface picks its own.
+
+**Middleware is `proxy.ts` (Next.js 16).** The session-refresh + `/admin` gate lives in [`src/proxy.ts`](../src/proxy.ts) (export `proxy`, **not** `middleware` — Next 16 renamed the convention) and delegates to `src/lib/supabase/middleware.ts`. Don't create a `middleware.ts`; Next 16 ignores it with a deprecation warning.
+
+**Server-side auth checks use `getClaims()`** — it verifies the JWT and is the current Supabase SSR guidance (not `getSession`, and preferred over `getUser` for SSR). Always go through the typed clients in `src/lib/supabase/` ([ADR-0006](./decisions/0006-authentication.md)).
+
+ADR anchors: [ADR-0004](./decisions/0004-admin-dashboard-architecture.md), [ADR-0006](./decisions/0006-authentication.md).
+
+---
+
 ## Container component
 
 **Location:** [`src/components/container.tsx`](../src/components/container.tsx).
