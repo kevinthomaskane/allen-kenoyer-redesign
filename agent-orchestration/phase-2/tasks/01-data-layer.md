@@ -97,5 +97,5 @@ the import-boundary lists (CLAUDE.md, dev-guide). Dev-guide § Type discipline
 stub filled in.
 
 `pnpm check` ✓ (lint + format + typecheck + 25 vitest tests) and `pnpm test:e2e`
-✓ (16/16, unchanged Phase-1 routes). PR: _(opened below)_.
+✓ (16/16, unchanged Phase-1 routes). PR: https://github.com/kevinthomaskane/allen-kenoyer-redesign/pull/1.
 </content>
