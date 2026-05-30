@@ -2,7 +2,7 @@
 id: 02-auth-and-admin-shell
 title: Auth & admin shell
 phase: 2
-status: todo
+status: in-progress
 depends_on: [01-data-layer]
 adrs_realized: [0004, 0006, 0021]
 ---
