@@ -216,3 +216,14 @@ The exact `allowedElements` list and the link-component override are filled in w
 ## Admin image upload *(stub — Phase 2)*
 
 Browser-side upload via `supabase-js` writing to the `site-images` bucket, per [ADR-0007](./decisions/0007-image-pipeline-and-storage.md) and [ADR-0021](./decisions/0021-admin-class-workflow-ux.md) (decision K). Fill in once the first admin upload form ships.
+
+---
+
+## Public-form spam protection *(stub — Phase 3)*
+
+Public-form Server Actions are protected by two layers per [ADR-0010](./decisions/0010-form-submission-and-transactional-email.md), which records that the layer exists and leaves the implementation here:
+
+- **Honeypot** — a hidden field every public form renders; a non-empty value means a bot, and the action returns success-shaped output **without sending email**. No store, no dependency.
+- **Per-IP rate limit — backed by Supabase Postgres** (Kevin's call, Phase 3 authoring). Reuse the DB we already run rather than adding a vendor (Upstash) or platform feature (Vercel Firewall): a small counter object (table or function) checked from each public-form Server Action, keyed by client IP within a time window. No new dependency or env var. Tradeoff accepted: the otherwise email-only public form now reads/writes the DB on submit.
+
+Exact shape (table vs. SQL function, window length and request ceiling, how the client IP is read from request headers in a Server Action, and the success-shaped rejection so a tripped limit never reveals the rule to a bot) is filled in when the first public-form pipeline ships (Phase 3 task `01-submission-pipeline`). ADR anchor: [ADR-0010](./decisions/0010-form-submission-and-transactional-email.md).
