@@ -18,7 +18,8 @@ agent-orchestration
 .agents
 
 # Database migration record (SQL + notes), not application code.
-supabase
+# Anchored to root so it does not also skip src/lib/supabase/.
+/supabase
 
 # Supabase-generated types — committed artifact, matches `gen types` output.
 src/types/database.ts
