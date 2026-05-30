@@ -4,7 +4,12 @@ Workflow for running two or more Claude Code sessions simultaneously on this rep
 
 ## Why this guide exists
 
-A previous parallel session ran two Claudes in the same working tree on `main`. Both were editing files; both staged and committed independently. A commit from one session unexpectedly swept in the other session's uncommitted work — `git status` showed only the four expected staged files immediately before commit, but the resulting commit contained 18 files (2996 insertions). Root cause was not identified. The structural fix is to give each parallel session its own working tree so that `git status`, the index, and the working directory are physically isolated. That is what this guide describes.
+A previous parallel session ran two Claudes in the same working tree on `main`. Both were editing files; both staged and committed independently. A commit from one session unexpectedly swept in the other session's uncommitted work — `git status` showed only the four expected staged files immediately before commit, but the resulting commit contained 18 files (2996 insertions). Root cause was not identified. The structural fix is to give every parallel session its own working tree so that `git status`, the index, and the working directory are physically isolated. That is what this guide describes.
+
+**Every active session works in its own `ak-<task>` worktree — no session edits in the primary tree on `main`.** Isolation only requires that the two sessions not *share* a tree, so in principle one could stay on `main` while the other branches. We don't do that, for two reasons beyond contamination:
+
+- **`main` stays a frozen integration base.** If one session committed directly to `main` while the other branched off it, `main` would move out from under the branch and the `--ff-only` merge at convergence could fail — reintroducing exactly the divergence the worktree is meant to avoid. When neither session writes to `main` during the run, both branches share a fixed base and both fast-forward cleanly.
+- **Symmetric convergence.** Both halves of the work land on `parallel/<task>` branches, so both go through the same preview-deploy / merge path and are reviewable the same way. Nothing skips the flow.
 
 Don't try to skip the worktree by being "extra careful with `git add`" — the same approach failed once already, silently, in a way we couldn't reproduce.
 
@@ -17,7 +22,7 @@ The presence of another session is the trigger, not the size or shape of the wor
 
 ## Setup (one-time per parallel session)
 
-From the primary working tree (the original checkout at `/Users/kevinkane/Code/allen-kenoyer-redesign`):
+Run this for **each** session, including the first — the primary tree stays on `main` as the untouched integration base. From the primary working tree (the original checkout at `/Users/kevinkane/Code/allen-kenoyer-redesign`):
 
 ```bash
 git worktree add ../ak-<short-task-name> -b parallel/<task-name>
@@ -59,7 +64,7 @@ git branch --show-current       # MUST print parallel/<task-name>
 
 ## Convergence and cleanup
 
-When the parallel work is done and pushed:
+When the parallel work is done and pushed, integrate from the primary tree — it's been sitting on a clean `main` this whole time, so it's the natural place to merge each branch in. Do them one at a time:
 
 ```bash
 # From the primary tree:
@@ -69,7 +74,9 @@ git merge --ff-only origin/parallel/<task-name>     # or open a PR and merge via
 git push origin main
 ```
 
-Once merged into `main`:
+The first branch fast-forwards cleanly because `main` hasn't moved. After it merges, `main` advances — so the second branch may no longer ff-merge; merge it normally (or via PR) and resolve any overlap then. Repeat `fetch` → merge → `push` for each `parallel/<task-name>` branch.
+
+Once a branch is merged into `main`:
 
 ```bash
 git worktree remove ../ak-<short-task-name>
