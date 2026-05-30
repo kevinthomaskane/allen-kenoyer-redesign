@@ -42,15 +42,15 @@ This ADR bundles four tightly-coupled calls:
 1. **Engine:** Postgres.
 2. **Provider:** Supabase Pro (Kevin's existing 10xDev account).
 3. **Query layer:** `supabase-js` SDK. No ORM.
-4. **Migration tooling:** Supabase CLI, with migration SQL files committed to the repo at `supabase/migrations/`.
+4. **Migration tooling:** the **Supabase MCP connector**, with migration SQL mirrored into the repo at `supabase/migrations/`. (The Supabase CLI / `db push` workflow this ADR originally specified was never adopted; this records the approach actually in use as of Phase 2.)
 
-**Authoring workflow (4a):** Hand-written SQL for one-liners; `supabase db diff -f <name>` against a local `supabase start` instance for non-trivial schema changes. Both are acceptable and used as needed.
+**Authoring workflow (4a):** Iterate with the connector's `execute_sql`; when a change is stable, commit it with `apply_migration`, which records a versioned entry in the project's migration history. No local `supabase start` / `db diff` step.
 
-**Deployment workflow (4b):** Local-manual `supabase db push` as the primary path (Kevin runs it before deploying), with a **GitHub Action backstop** that runs `supabase db push --linked` on merge to `main`. The two are complementary: local-manual gives the human gate; the Action ensures nothing is forgotten if a migration lands in `main` without a local push.
+**Deployment workflow (4b):** Schema is applied directly to the project via `apply_migration` — there is no `db push` and no GitHub Action backstop. The reviewable record is the SQL mirrored into `supabase/migrations/<version>_<name>.sql` (filename matching the connector-assigned version) plus the project's own migration history. After any DDL, run `get_advisors` and fix or document findings.
 
-**Coordination guardrail:** Per Supabase's documented warning, concurrent pushes from different sources can race. Since this project has a single developer, the practical rule is *run `db push` locally before merging, then let the Action no-op on the now-applied migration.* If the team ever grows, revisit.
+**Coordination guardrail:** A single developer applies changes from one place (the connector), so there is no concurrent-push race to manage. If the team grows or a CI-driven pipeline becomes warranted, revisit — adopting the CLI `db push` + Action model is a forward option.
 
-**TypeScript types:** Run `supabase gen types typescript --linked --schema=public > src/types/supabase.ts` after schema changes; treat the generated file as a build artifact committed to the repo so the app has accurate types without a generation step on every deploy.
+**TypeScript types:** Regenerate via the connector after schema changes and commit the result to `src/types/database.ts`; treat the generated file as an artifact committed to the repo so the app has accurate types without a generation step on every deploy.
 
 ## Rationale
 
@@ -65,12 +65,12 @@ This ADR bundles four tightly-coupled calls:
 - **Vendor coupling to Supabase.** Moving off Supabase would require rewriting all data-access code (replacing `supabase-js` with whatever the new provider's idiom is) plus migrating the database. Acceptable because the Pro plan economics and bundled feature surface (auth, storage) make migration unlikely; if it ever happens, the rewrite is bounded because the data model is small.
 - **Less query expressiveness than raw SQL or an ORM.** `supabase-js` is PostgREST-shaped, which makes complex joins, window functions, CTEs, and aggregations awkward — they require Postgres RPC functions instead. Acceptable because the two-table data model has no complex queries; revisit if scope grows.
 - **No transferable ORM experience accrued.** Earlier in this discussion we considered Prisma specifically for career-skill leverage; choosing `supabase-js` trades that for project-fit. Acceptable per Kevin's call after the comparison.
-- **Concurrent-push race** between local-manual and the GH Action backstop is a real risk if not coordinated. Mitigated by single-developer reality and the documented rule of pushing locally before merging.
+- **No automated migration pipeline / human-gate Action.** Schema is applied directly via the connector, so no CI step re-applies or verifies migrations on merge. Mitigated by the single-developer reality, the `supabase/migrations/` mirror as the review record, and the `get_advisors` step after each DDL. Revisit if the team or release cadence grows.
 
 ## Operational notes (referenced by but not part of this decision)
 
-- **Supabase MCP server** is available as an official Claude connector. Recommended for this project's AI-assisted workflow — gives direct schema/SQL/types tooling without leaving the conversation. Setup is per-developer tooling, not project architecture.
-- **Required GitHub secrets** for the deployment Action: `SUPABASE_ACCESS_TOKEN`, `SUPABASE_DB_PASSWORD`, `SUPABASE_PROJECT_ID`. Specific Action YAML lives in the dev guide.
+- **Supabase MCP connector** is the schema/SQL/types tooling for this project (decision point 4) — the official Claude connector; setup is per-developer tooling, not project architecture.
+- **Server-side secret:** `SUPABASE_SECRET_KEY` (the modern replacement for the legacy `service_role` JWT) lives only in local `.env.local`, used by server-side scripts (e.g. the image migration). No GitHub Action secrets are required, since there is no migration-deploy Action.
 
 ## Related decisions
 

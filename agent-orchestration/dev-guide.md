@@ -114,7 +114,7 @@ ADR anchor: [ADR-0007](./decisions/0007-image-pipeline-and-storage.md).
 
 ## Import boundaries — what `src/` may import from
 
-**`src/` code may not import from `content/`, `scripts/`, `docs/`, `agent-orchestration/`, `demo/`, or `.agents/`.** All are listed in [`.vercelignore`](../.vercelignore) — imports resolve locally but fail the production build with "Module not found."
+**`src/` code may not import from `content/`, `scripts/`, `docs/`, `agent-orchestration/`, `demo/`, `.agents/`, or `supabase/`.** All are listed in [`.vercelignore`](../.vercelignore) — imports resolve locally but fail the production build with "Module not found." (`supabase/` holds SQL migrations only; the app consumes the DB through generated types in `src/types/` and the clients in `src/lib/supabase/`, never by importing migration files.)
 
 This trips even read-only data imports. `import manifest from "../../content/manifest.json"` looks harmless locally but breaks the Vercel build because the file never reaches the build environment.
 
@@ -157,11 +157,15 @@ ADR anchor: [ADR-0017](./decisions/0017-content-modeling-patterns-catalog.md).
 
 ---
 
-## Type discipline *(stub — Phase 2)*
+## Type discipline
 
-**Anchored rule (from [ADR-0005](./decisions/0005-database-and-query-layer.md)):** types for table rows come from `supabase gen types typescript` (committed at `src/types/database.ts` or equivalent — exact path TBD). Application code consumes generated types; don't redeclare row shapes by hand. Form types derive from Zod schemas via `z.infer<>` ([ADR-0009](./decisions/0009-forms-and-validation.md)).
+**Database row types are generated, never hand-written.** Regenerate via the Supabase MCP connector after any schema change and commit the result to [`src/types/database.ts`](../src/types/database.ts) (see [`../supabase/README.md`](../supabase/README.md)). The file is an artifact — don't edit it by hand.
 
-Fill in when the first Phase 2 PR that touches schema-generated types lands.
+- **Consume the generated helpers:** `Tables<"classes">` for a row, `TablesInsert<"classes">` / `TablesUpdate<"classes">` for writes, `Enums<"class_category">` for an enum union. Don't redeclare row shapes.
+- **Supabase clients are typed with `Database`:** `createClient()` from [`src/lib/supabase/client.ts`](../src/lib/supabase/client.ts) (browser / Client Components) and [`src/lib/supabase/server.ts`](../src/lib/supabase/server.ts) (Server Components, Server Actions, Route Handlers). Both thread the schema types through to query results — prefer them over a bare `@supabase/supabase-js` client.
+- **Form types derive from Zod schemas** via `z.infer<>` ([ADR-0009](./decisions/0009-forms-and-validation.md)) — the write-side counterpart to generated row types.
+
+ADR anchor: [ADR-0005](./decisions/0005-database-and-query-layer.md).
 
 ---
 
