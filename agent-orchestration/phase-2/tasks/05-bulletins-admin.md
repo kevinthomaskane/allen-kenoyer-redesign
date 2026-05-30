@@ -2,7 +2,7 @@
 id: 05-bulletins-admin
 title: Bulletins admin
 phase: 2
-status: todo
+status: in-progress
 depends_on: [02-auth-and-admin-shell]
 adrs_realized: [0004, 0016]
 ---
