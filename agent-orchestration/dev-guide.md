@@ -185,6 +185,20 @@ ADR anchor: [ADR-0005](./decisions/0005-database-and-query-layer.md).
 
 ---
 
+## Forms (Zod + React Hook Form + shadcn `<Form>`)
+
+The mutation-form stack from [ADR-0009](./decisions/0009-forms-and-validation.md), first landed by the bulletin admin (task 05). Pattern, by file:
+
+- **`schema.ts`** (colocated with the feature, e.g. `app/admin/(protected)/bulletins/schema.ts`) — one Zod schema, `export type …Values = z.infer<typeof schema>`. It's the single contract, used by both the client resolver and the Server Action.
+- **`<feature>-form.tsx`** (`"use client"`) — `useForm({ resolver: zodResolver(schema), defaultValues })`, fields via shadcn `<FormField>/<FormItem>/<FormLabel>/<FormControl>/<FormMessage>`. The form receives its submit handler as an `action` prop (a Server Action, bound with the row id on edit) so the same component does create and edit ([ADR-0021](./decisions/0021-admin-class-workflow-ux.md) E). On success the action `redirect()`s; a returned `{ error }` is surfaced inline.
+- **`actions.ts`** (`"use server"`) — the action **re-runs `schema.safeParse`** (never trust the client), maps form values → DB row (camelCase form fields → snake_case columns), converts datetime-local wall strings to UTC at this boundary (§ Date/time handling), writes through the typed server client, then `revalidatePath` + `redirect`. Writes run as the authenticated user via the cookie-backed client — RLS ([ADR-0006](./decisions/0006-authentication.md)) is the enforcement layer, so no service-role key.
+
+Form values carry the *input* shape (datetime-local strings, `""` for empty optionals); normalize to DB shape (`null`, UTC) in the action, not the schema.
+
+**Toolbar-driven textareas** (the bulletin markdown toolbar): keep the selection/insertion logic in a pure, unit-tested module (`markdown.ts`) and the button row in a thin `"use client"` component — don't bury string-slicing in the component.
+
+ADR anchors: [ADR-0009](./decisions/0009-forms-and-validation.md), [ADR-0010](./decisions/0010-form-submission-and-transactional-email.md).
+
 ## Date/time handling
 
 Cohort sessions, bulletin display windows, and GCal sync all touch timestamps. The rules:
@@ -196,13 +210,14 @@ Cohort sessions, bulletin display windows, and GCal sync all touch timestamps. T
   - **Display → native `Intl.DateTimeFormat`** with `{ timeZone: STUDIO_TZ }`. No library — it is the correct, DST-aware tool for formatting.
   - **Wall-time→UTC conversion and DST-safe recurrence stepping → Luxon.** `DateTime.fromObject({ … }, { zone: STUDIO_TZ }).toUTC()` for storage; `.plus({ weeks: 1 })` for the recurrence builder's row expansion ([ADR-0021](./decisions/0021-admin-class-workflow-ux.md) decision D). Luxon is used *only* for these in-zone operations, not as a general formatting layer.
 
-**Display helpers** live in [`src/lib/datetime.ts`](../src/lib/datetime.ts), all keyed to `STUDIO_TZ` (which now lives in [`site-config.ts`](../src/lib/site-config.ts)):
+**Helpers live in [`src/lib/studio-time.ts`](../src/lib/studio-time.ts)** — the single studio-tz module:
 
-- `formatStudioDate(iso)` → `"Jun 1, 2026"`
-- `formatStudioDateTime(iso)` → `"Jun 1, 2026, 6:00 PM"`
-- `formatNextSession(iso | null)` → the above, or an em dash (`—`) for null (the rich list's empty Next-session cell).
+- Luxon, for `<input type="datetime-local">` ↔ UTC: `wallTimeToUtc` / `utcToWallTimeInput` / `nowWallTimeInput`.
+- Intl display (DST-aware, no library): `formatStudioDateTime` ("Jun 1, 2026, 6:00 PM") and `formatStudioDate` ("Jun 1, 2026").
 
-These normalize ICU's narrow-no-break space (U+202F, emitted by Node 24 before AM/PM) to a regular space so output is predictable and testable. Range rendering ("6:00–8:30 PM") isn't needed until session rows render (task 04); add it here when it lands. ADR anchors: [ADR-0015](./decisions/0015-content-modeling-classes.md), [ADR-0020](./decisions/0020-google-calendar-integration.md), [ADR-0021](./decisions/0021-admin-class-workflow-ux.md).
+First landed by **task 05** (bulletin display windows); **task 03** added `formatStudioDate` for the class list and renders dates server-side (so the client table ships no date library); **task 04** extends it with recurrence stepping for session rows. Never `new Date(localInput)` for storage — that silently uses the *browser's* zone, not `STUDIO_TZ`. The list's empty Next-session cell renders an em dash inline; no separate helper.
+
+Range rendering for multi-session cohorts ("6:00–8:30 PM") is settled as it lands in the scheduling-UI PR. ADR anchors: [ADR-0015](./decisions/0015-content-modeling-classes.md), [ADR-0020](./decisions/0020-google-calendar-integration.md), [ADR-0021](./decisions/0021-admin-class-workflow-ux.md).
 
 ---
 
@@ -221,7 +236,7 @@ The exact `allowedElements` list and the link-component override are filled in w
 
 ## Admin image upload
 
-Browser-side upload via `supabase-js` writing to the `site-images` bucket, per [ADR-0007](./decisions/0007-image-pipeline-and-storage.md) and [ADR-0021](./decisions/0021-admin-class-workflow-ux.md) (decision H). The class image control is `src/app/admin/classes/image-field.tsx`.
+Browser-side upload via `supabase-js` writing to the `site-images` bucket, per [ADR-0007](./decisions/0007-image-pipeline-and-storage.md) and [ADR-0021](./decisions/0021-admin-class-workflow-ux.md) (decision H). The class image control is `src/app/admin/(protected)/classes/image-field.tsx`.
 
 - **Direct browser write.** On file pick, bytes upload from the client (`createClient()` from [`supabase/client.ts`](../src/lib/supabase/client.ts)) under Kristin's authenticated session — never through the Server Action. The action only persists the returned URL + alt text on Save. The Phase 1 RLS policy grants `authenticated` INSERT/UPDATE on `site-images` (upsert needs both).
 - **Path convention:** `classes/<uuid>-<slugified-filename>.<ext>` via `crypto.randomUUID()`. The UUID prefix prevents two classes that upload a same-named file from clobbering each other. This deviates from a fully deterministic path; the ADR's orphan residual (pick a file, never Save) is accepted in a public-read bucket.
@@ -229,3 +244,14 @@ Browser-side upload via `supabase-js` writing to the `site-images` bucket, per [
 - **Alt text is required when an image is present** — enforced in `classFormSchema` (`src/lib/class-form-schema.ts`), not just the UI.
 
 ADR anchors: [ADR-0007](./decisions/0007-image-pipeline-and-storage.md), [ADR-0021](./decisions/0021-admin-class-workflow-ux.md).
+
+---
+
+## Public-form spam protection *(stub — Phase 3)*
+
+Public-form Server Actions are protected by two layers per [ADR-0010](./decisions/0010-form-submission-and-transactional-email.md), which records that the layer exists and leaves the implementation here:
+
+- **Honeypot** — a hidden field every public form renders; a non-empty value means a bot, and the action returns success-shaped output **without sending email**. No store, no dependency.
+- **Per-IP rate limit — backed by Supabase Postgres** (Kevin's call, Phase 3 authoring). Reuse the DB we already run rather than adding a vendor (Upstash) or platform feature (Vercel Firewall): a small counter object (table or function) checked from each public-form Server Action, keyed by client IP within a time window. No new dependency or env var. Tradeoff accepted: the otherwise email-only public form now reads/writes the DB on submit.
+
+Exact shape (table vs. SQL function, window length and request ceiling, how the client IP is read from request headers in a Server Action, and the success-shaped rejection so a tripped limit never reveals the rule to a bot) is filled in when the first public-form pipeline ships (Phase 3 task `01-submission-pipeline`). ADR anchor: [ADR-0010](./decisions/0010-form-submission-and-transactional-email.md).

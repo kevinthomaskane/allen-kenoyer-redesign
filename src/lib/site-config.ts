@@ -2,9 +2,10 @@
 // Nav structure per the docs/website-outline.md decisions (Services dropdown
 // for the four service pages; Classes/Supplies dropdowns each with one sub-route).
 
-// Studio timezone — the single source of truth for every wall-clock ↔ UTC
-// conversion and every datetime display (dev-guide § Date/time handling).
-// There is no per-record or admin-editable zone (ADR-0015, ADR-0020, ADR-0021).
+// The studio's wall-clock timezone. Hardcoded, single source of truth for every
+// UTC↔local conversion and datetime display (dev-guide § Date/time handling);
+// there is no per-record or admin-editable zone (ADR-0015, ADR-0020, ADR-0021).
+// Consumed by src/lib/studio-time.ts and src/lib/datetime.ts.
 export const STUDIO_TZ = "America/Los_Angeles";
 
 export const siteContact = {
