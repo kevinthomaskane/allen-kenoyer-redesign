@@ -37,7 +37,7 @@ export function SiteNav() {
           >
             <Image
               src="/logo-allen-kenoyer-glass.png"
-              alt=""
+              alt="Allen Kenoyer Glass logo"
               width={549}
               height={207}
               className="h-10 w-auto md:h-12"
@@ -127,7 +127,7 @@ function DesktopLinks() {
             {isOpen && (
               <div
                 role="menu"
-                className="bg-card absolute top-full left-0 z-50 mt-1 min-w-56 rounded-md border border-black/5 py-2 shadow-lg"
+                className="bg-card absolute top-full left-0 z-50 mt-1 min-w-56 overflow-hidden rounded-md border border-black/5 py-2 shadow-lg"
               >
                 {item.children.map((child) => (
                   <Link
