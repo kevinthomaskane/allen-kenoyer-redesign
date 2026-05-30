@@ -66,7 +66,7 @@ Sliced by system/workstream. The data layer and the auth shell are the shared fo
 
 | ID | Title | Status | Depends on |
 | -- | ----- | ------ | ---------- |
-| 01-data-layer | Data layer & schema | todo | — |
+| 01-data-layer | Data layer & schema | in-progress | — |
 | 02-auth-and-admin-shell | Auth & admin shell | todo | 01-data-layer |
 | 03-classes-admin | Classes admin | todo | 02-auth-and-admin-shell |
 | 04-cohorts-and-sessions | Cohorts & sessions | todo | 03-classes-admin |

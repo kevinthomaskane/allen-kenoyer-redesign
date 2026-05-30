@@ -2,7 +2,7 @@
 id: 01-data-layer
 title: Data layer & schema
 phase: 2
-status: todo
+status: in-progress
 depends_on: []
 adrs_realized: [0005, 0006, 0015, 0016]
 ---
