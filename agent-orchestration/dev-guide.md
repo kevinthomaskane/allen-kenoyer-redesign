@@ -185,6 +185,20 @@ ADR anchor: [ADR-0005](./decisions/0005-database-and-query-layer.md).
 
 ---
 
+## Forms (Zod + React Hook Form + shadcn `<Form>`)
+
+The mutation-form stack from [ADR-0009](./decisions/0009-forms-and-validation.md), first landed by the bulletin admin (task 05). Pattern, by file:
+
+- **`schema.ts`** (colocated with the feature, e.g. `app/admin/(protected)/bulletins/schema.ts`) — one Zod schema, `export type …Values = z.infer<typeof schema>`. It's the single contract, used by both the client resolver and the Server Action.
+- **`<feature>-form.tsx`** (`"use client"`) — `useForm({ resolver: zodResolver(schema), defaultValues })`, fields via shadcn `<FormField>/<FormItem>/<FormLabel>/<FormControl>/<FormMessage>`. The form receives its submit handler as an `action` prop (a Server Action, bound with the row id on edit) so the same component does create and edit ([ADR-0021](./decisions/0021-admin-class-workflow-ux.md) E). On success the action `redirect()`s; a returned `{ error }` is surfaced inline.
+- **`actions.ts`** (`"use server"`) — the action **re-runs `schema.safeParse`** (never trust the client), maps form values → DB row (camelCase form fields → snake_case columns), converts datetime-local wall strings to UTC at this boundary (§ Date/time handling), writes through the typed server client, then `revalidatePath` + `redirect`. Writes run as the authenticated user via the cookie-backed client — RLS ([ADR-0006](./decisions/0006-authentication.md)) is the enforcement layer, so no service-role key.
+
+Form values carry the *input* shape (datetime-local strings, `""` for empty optionals); normalize to DB shape (`null`, UTC) in the action, not the schema.
+
+**Toolbar-driven textareas** (the bulletin markdown toolbar): keep the selection/insertion logic in a pure, unit-tested module (`markdown.ts`) and the button row in a thin `"use client"` component — don't bury string-slicing in the component.
+
+ADR anchors: [ADR-0009](./decisions/0009-forms-and-validation.md), [ADR-0010](./decisions/0010-form-submission-and-transactional-email.md).
+
 ## Date/time handling
 
 Cohort sessions, bulletin display windows, and GCal sync all touch timestamps. The rules:
@@ -196,7 +210,9 @@ Cohort sessions, bulletin display windows, and GCal sync all touch timestamps. T
   - **Display → native `Intl.DateTimeFormat`** with `{ timeZone: STUDIO_TZ }`. No library — it is the correct, DST-aware tool for formatting.
   - **Wall-time→UTC conversion and DST-safe recurrence stepping → Luxon.** `DateTime.fromObject({ … }, { zone: STUDIO_TZ }).toUTC()` for storage; `.plus({ weeks: 1 })` for the recurrence builder's row expansion ([ADR-0021](./decisions/0021-admin-class-workflow-ux.md) decision D). Luxon is used *only* for these in-zone operations, not as a general formatting layer.
 
-Display conventions (exact format strings, range rendering like "6:00–8:30 PM") are settled as they land in the first scheduling-UI PR. ADR anchors: [ADR-0015](./decisions/0015-content-modeling-classes.md), [ADR-0020](./decisions/0020-google-calendar-integration.md), [ADR-0021](./decisions/0021-admin-class-workflow-ux.md).
+**Helpers live in [`src/lib/studio-time.ts`](../src/lib/studio-time.ts).** `wallTimeToUtc` / `utcToWallTimeInput` / `nowWallTimeInput` (Luxon, for `<input type="datetime-local">` ↔ UTC) and `formatStudioDateTime` (Intl `dateStyle: "medium"` + `timeStyle: "short"` → "Jun 1, 2026, 6:00 PM"). First landed by **task 05** (bulletin display windows); **task 04** extends it with the recurrence stepping for session rows. Never `new Date(localInput)` for storage — that silently uses the *browser's* zone, not `STUDIO_TZ`.
+
+Range rendering for multi-session cohorts ("6:00–8:30 PM") is settled as it lands in the scheduling-UI PR. ADR anchors: [ADR-0015](./decisions/0015-content-modeling-classes.md), [ADR-0020](./decisions/0020-google-calendar-integration.md), [ADR-0021](./decisions/0021-admin-class-workflow-ux.md).
 
 ---
 

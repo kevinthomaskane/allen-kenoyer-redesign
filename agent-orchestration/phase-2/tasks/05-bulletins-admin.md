@@ -2,7 +2,7 @@
 id: 05-bulletins-admin
 title: Bulletins admin
 phase: 2
-status: in-progress
+status: done
 depends_on: [02-auth-and-admin-shell]
 adrs_realized: [0004, 0016]
 ---
@@ -44,6 +44,47 @@ Schema and rules are in [ADR-0016](../../decisions/0016-content-modeling-bulleti
 
 ## Resolution
 
-_Appended on completion. Document what shipped, any in-flight decisions or
-deviations, and the PR link._
-</content>
+Shipped on branch `parallel/05-bulletins-admin` (parallel worktree per
+`docs/parallel-claude-sessions.md`, alongside the `03-classes-admin` session).
+
+**Surface.** `/admin/bulletins` list (active by default — draft/queued/visible,
+newest `display_start` first — with a "Show past (N)" link revealing expired
+rows, mirroring the cohort lifecycle), `/admin/bulletins/new`, and
+`/admin/bulletins/[id]` edit. A shared `BulletinForm` (React Hook Form + Zod +
+shadcn `<Form>`, ADR-0009) does both create and edit; create/update/delete are
+Server Actions that re-validate with the same schema, convert wall-time→UTC at
+the boundary, write through the authenticated cookie client (RLS-enforced,
+ADR-0006), then `revalidatePath`. The markdown toolbar (bold/italic/link/list)
+inserts syntax via a pure, unit-tested `markdown.ts` helper. The four ADR-0016
+states render as distinct status badges; "Queued" is the explicit
+published-but-not-visible-yet state (ADR-0016 tradeoff note).
+
+**Date/time foundation landed here (Kevin's call).** Task 05 established the
+shared `src/lib/studio-time.ts` (`wallTimeToUtc` / `utcToWallTimeInput` /
+`nowWallTimeInput` via Luxon, `formatStudioDateTime` via Intl) and `STUDIO_TZ`
+in `site-config.ts`, ahead of task 04 — which the phase plan had nominally
+chartered to create it. Task 04 now *extends* it with recurrence stepping;
+dev-guide § Date/time and phase-2 README workstream D were updated to match, and
+a new dev-guide § Forms documents the ADR-0009 stack (its first landing — task
+02 had deferred it).
+
+**Reused, not duplicated.** `isBulletinVisible` (shipped by task 01) now
+delegates to a new `bulletinStatus` 4-state classifier so the boolean and the
+classifier cannot drift; task 01's visibility tests still stand.
+
+**Deps** (versions verified at install): `luxon@3.7.2`, `zod@4.4.3`,
+`react-hook-form@7.76.1`, `@hookform/resolvers@5.4.0`, `@types/luxon@3.7.1`.
+shadcn primitives added: `form`, `textarea`, `switch`, `badge`, `table`.
+
+**One shared-config fix.** `vitest.config.ts` had no path-alias resolution, so a
+runtime `@/` import (`STUDIO_TZ`) failed under Vitest — type-only `@/` imports
+had masked the gap. Added `resolve.alias` mirroring tsconfig's `@/* → ./src/*`.
+
+**Verification.** `pnpm check` ✓ (lint + format + typecheck + 47 Vitest tests,
+incl. the `bulletinStatus` 4-state cases, `studio-time` DST round-trip, and
+`markdown` insertion coverage). `pnpm test:e2e` ✓ (24 passed) — run with seeded
+admin creds: toolbar-create→Visible→delete, future-start→Queued,
+expired→hidden-until-"Show past", plus the existing auth + smoke suites.
+
+PR: _pending push_
+
