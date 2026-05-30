@@ -93,5 +93,5 @@ round-trip skipped where `E2E_ADMIN_*` creds are absent (same gating as the
 task-02 auth round-trip — it exercises create→list→publish→image-persist when
 run against a seeded user).
 
-PR: _pending push._
+PR: https://github.com/kevinthomaskane/allen-kenoyer-redesign/pull/4
 </content>
