@@ -62,9 +62,9 @@ sinks, Last-updated-desc tiebreak) via the pure `selectClassRows`. `new` and
 Pure logic landed test-first in `src/lib/`: `slug.ts` (`slugify` + collision-
 resolving `uniqueSlug`), `class-status.ts` (`resolveClassStatus` → the four
 states; `classStatusInfo` is the single label source the pill and banner both
-read, so they can't drift), `class-list.ts` (sort/filter/search),
-`datetime.ts` (Intl studio-zone helpers), plus `class-form-schema.ts` and
-`class-labels.ts`. 56 unit tests pass.
+read, so they can't drift), `class-list.ts` (sort/filter/search), plus
+`class-form-schema.ts` and `class-labels.ts`. Date display reuses the shared
+`studio-time.ts` (see Convergence). Routes live under `admin/(protected)/`.
 
 Decisions/deviations:
 - **Field→section (ADR-0021 F, left to implementation):** Basics (name,
@@ -87,11 +87,22 @@ Slug auto-derives on every save and excludes the edited row from the
 uniqueness check. The `[id]` page carries a `#cohorts` placeholder section that
 the banner links to and task 04 will populate.
 
-Verified: `pnpm check` (lint/prettier/typecheck/56 tests) and `pnpm build`
+Verified: `pnpm check` (lint/prettier/typecheck/tests) and `pnpm build`
 both pass; `pnpm test:e2e` passes with the new `admin-classes.spec.ts`
 round-trip skipped where `E2E_ADMIN_*` creds are absent (same gating as the
 task-02 auth round-trip — it exercises create→list→publish→image-persist when
 run against a seeded user).
+
+**Convergence (merged main after task 05 bulletins landed first):**
+- Fixed a placement bug — classes routes moved from `admin/classes` into
+  `admin/(protected)/classes` so they get the admin chrome + the layout's
+  `getClaims` guard (URLs unchanged; route groups don't affect paths). Task 05
+  had it right for bulletins; I'd missed it.
+- Both branches added `STUDIO_TZ` to `site-config.ts` and a `form.tsx`
+  primitive (kept main's). Consolidated date display: deleted my `datetime.ts`
+  and reuse task 05's `src/lib/studio-time.ts`, adding `formatStudioDate` there;
+  the list formats Next-session / Last-updated **server-side** so the client
+  table ships no date library (studio-time pulls in Luxon). 69 tests pass post-merge.
 
 PR: https://github.com/kevinthomaskane/allen-kenoyer-redesign/pull/4
 </content>

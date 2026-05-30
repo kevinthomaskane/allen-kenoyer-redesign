@@ -16,8 +16,12 @@ export interface ClassListRow {
   status: ClassStatusState;
   /** ISO timestamp of the earliest upcoming *visible* session, or null. */
   nextSessionAt: string | null;
+  /** Studio-tz display of `nextSessionAt`, or an em dash. Formatted server-side. */
+  nextSessionLabel: string;
   /** ISO timestamp; tiebreaker for the default sort. */
   updatedAt: string;
+  /** Studio-tz display of `updatedAt`. Formatted server-side. */
+  updatedLabel: string;
 }
 
 export interface ClassListFilters {

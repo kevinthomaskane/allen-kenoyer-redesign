@@ -21,7 +21,6 @@ import {
 } from "@/components/ui/table";
 import { Constants } from "@/types/database";
 import { CLASS_CATEGORY_LABELS, SKILL_LEVEL_LABELS } from "@/lib/class-labels";
-import { formatNextSession, formatStudioDate } from "@/lib/datetime";
 import { classStatusInfo, type ClassStatusState } from "@/lib/class-status";
 import {
   selectClassRows,
@@ -171,8 +170,8 @@ export function ClassesTable({ rows }: { rows: ClassListRow[] }) {
                   </TableCell>
                   <TableCell>{CLASS_CATEGORY_LABELS[row.category]}</TableCell>
                   <TableCell>{SKILL_LEVEL_LABELS[row.skillLevel]}</TableCell>
-                  <TableCell>{formatNextSession(row.nextSessionAt)}</TableCell>
-                  <TableCell>{formatStudioDate(row.updatedAt)}</TableCell>
+                  <TableCell>{row.nextSessionLabel}</TableCell>
+                  <TableCell>{row.updatedLabel}</TableCell>
                 </TableRow>
               ))}
             </TableBody>

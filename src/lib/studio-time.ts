@@ -60,3 +60,14 @@ export function formatStudioDateTime(utcIso: string): string {
     timeStyle: "short",
   }).format(new Date(utcIso));
 }
+
+/**
+ * Studio-local date only, via native Intl. E.g. "Jun 1, 2026". Used by the
+ * class list's Last-updated column (task 03).
+ */
+export function formatStudioDate(utcIso: string): string {
+  return new Intl.DateTimeFormat("en-US", {
+    timeZone: STUDIO_TZ,
+    dateStyle: "medium",
+  }).format(new Date(utcIso));
+}

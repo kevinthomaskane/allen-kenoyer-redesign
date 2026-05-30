@@ -15,7 +15,9 @@ function row(overrides: Partial<ClassListRow>): ClassListRow {
     skillLevel: overrides.skillLevel ?? "beginner",
     status: overrides.status ?? "live",
     nextSessionAt: overrides.nextSessionAt ?? null,
+    nextSessionLabel: overrides.nextSessionLabel ?? "—",
     updatedAt: overrides.updatedAt ?? "2026-01-01T00:00:00Z",
+    updatedLabel: overrides.updatedLabel ?? "",
   };
 }
 

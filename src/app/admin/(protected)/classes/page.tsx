@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/server";
 import { resolveClassStatus } from "@/lib/class-status";
+import { formatStudioDate, formatStudioDateTime } from "@/lib/studio-time";
 import type { ClassListRow } from "@/lib/class-list";
 
 import { ClassesTable } from "./classes-table";
@@ -53,7 +54,11 @@ export default async function ClassesListPage() {
       skillLevel: cls.skill_level,
       status: status.state,
       nextSessionAt,
+      nextSessionLabel: nextSessionAt
+        ? formatStudioDateTime(nextSessionAt)
+        : "—",
       updatedAt: cls.updated_at,
+      updatedLabel: formatStudioDate(cls.updated_at),
     };
   });
 
