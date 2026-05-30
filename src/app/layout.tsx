@@ -1,9 +1,6 @@
 import type { Metadata } from "next";
 import { Montserrat, Playfair_Display } from "next/font/google";
 import "./globals.css";
-import { InfoBar } from "@/components/info-bar";
-import { SiteNav } from "@/components/site-nav";
-import { SiteFooter } from "@/components/site-footer";
 
 const montserrat = Montserrat({
   subsets: ["latin"],
@@ -27,6 +24,9 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://allenkenoyerglass.com"),
 };
 
+// Bare root shell. Public marketing chrome lives in (public)/layout.tsx; the
+// admin chrome lives in admin/(protected)/layout.tsx. Keeping the root layout
+// free of either lets the two surfaces diverge cleanly.
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
@@ -35,14 +35,7 @@ export default function RootLayout({
       lang="en"
       className={`${montserrat.variable} ${playfairDisplay.variable}`}
     >
-      <body className="flex min-h-screen flex-col">
-        <header className="sticky top-0 z-50">
-          <InfoBar />
-          <SiteNav />
-        </header>
-        <main className="flex-1">{children}</main>
-        <SiteFooter />
-      </body>
+      <body>{children}</body>
     </html>
   );
 }
