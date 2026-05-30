@@ -86,5 +86,5 @@ incl. the `bulletinStatus` 4-state cases, `studio-time` DST round-trip, and
 admin creds: toolbar-create→Visible→delete, future-start→Queued,
 expired→hidden-until-"Show past", plus the existing auth + smoke suites.
 
-PR: _pending push_
+PR: https://github.com/kevinthomaskane/allen-kenoyer-redesign/pull/3
 
